@@ -14,7 +14,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 const schema = zod.object({
-  name: zod.string().min(2, "Username must be at least 2 characters"),
+  username: zod.string().min(2, "Username must be at least 2 characters"),
   email: zod.string().email("Please enter a valid email address"),
   password: zod.string().min(8, "Password must be at least 8 characters"),
 });
@@ -55,11 +55,11 @@ export default function Register() {
             className="flex flex-col gap-y-4"
           >
             <Label
-              htmlFor="name"
+              htmlFor="username"
               label="Username"
-              error={errors.name?.message}
+              error={errors.username?.message}
             >
-              <Input id="username" {...register("name")} />
+              <Input id="username" {...register("username")} />
             </Label>
             <Label htmlFor="email" label="Email" error={errors.email?.message}>
               <Input id="email" {...register("email")} />

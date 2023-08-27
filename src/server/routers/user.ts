@@ -9,12 +9,12 @@ export const userRouter = router({
       z.object({
         email: z.string(),
         password: z.string(),
-        name: z.string(),
+        username: z.string(),
       })
     )
-    .mutation(async ({ input: { email, password, name }, ctx: { db } }) => {
+    .mutation(async ({ input: { email, password, username }, ctx: { db } }) => {
       try {
-        // await db.insert(user).values({ name, email, password });
+        await db.insert(user).values({ username, email, password });
         return {
           message: "You are signed up successfully",
         };
