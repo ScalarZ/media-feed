@@ -1,0 +1,27 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1690538878410,
+      "tag": "0000_dark_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1690539344888,
+      "tag": "0001_short_blonde_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1690539846389,
+      "tag": "0002_great_caretaker",
+      "breakpoints": true
+    }
+  ]
+}
