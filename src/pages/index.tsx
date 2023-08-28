@@ -18,8 +18,12 @@ export default function Home({ session }: { session: Session }) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  res,
+  query,
+}) => {
   return {
-    props: {},
+    props: { query },
   };
 };
