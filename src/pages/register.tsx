@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
-import { Loader2 } from "lucide-react";
+// import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 const schema = zod.object({
   username: zod.string().min(2, "Username must be at least 2 characters"),
@@ -72,7 +73,8 @@ export default function Register() {
             </Label>
             <Button type="submit" className="mt-2 flex gap-x-2 font-semibold">
               {isLoading && (
-                <Loader2 size={16} strokeWidth={3} className="animate-spin" />
+                // <Loader2 size={16} strokeWidth={3} className="animate-spin" />
+                <>loading</>
               )}
               Create
             </Button>

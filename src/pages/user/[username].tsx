@@ -4,7 +4,7 @@ import { User } from "@/types";
 import { getUserByUsername } from "@/utils/getUser";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]";
-import { GalleryVertical, Grid } from "lucide-react";
+// import { GalleryVertical, Grid } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
@@ -27,7 +27,7 @@ function User({ user }: { user: User }) {
         feeds 👋
       </h1>
       <div className="flex justify-center gap-x-6">
-        <GalleryVertical
+        {/* <GalleryVertical
           className={`p-2 rounded ${
             view === "scroll" && "bg-slate-200"
           } cursor-pointer box-content hover:bg-slate-200`}
@@ -38,7 +38,7 @@ function User({ user }: { user: User }) {
             view === "grid" && "bg-slate-200"
           } cursor-pointer box-content hover:bg-slate-200`}
           onClick={() => handleView("grid")}
-        />
+        /> */}
       </div>
       <Posts user={user} view={view} />
     </div>

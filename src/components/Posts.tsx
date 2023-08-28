@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import Post from "./Posts/Post";
 import { trpc } from "@/utils/trpc";
 import { User } from "@/types";
-import { Loader2 } from "lucide-react";
+// import { Loader2 } from "lucide-react";
 import EditPostWindow from "./EditPostWindow";
 import { Dialog } from "./ui/dialog";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
@@ -25,7 +25,7 @@ export default function Posts({
   if (isLoadingPosts)
     return (
       <div className="py-4 flex justify-center">
-        <Loader2 className="animate-spin" />
+        {/* <Loader2 className="animate-spin" /> */}
       </div>
     );
 

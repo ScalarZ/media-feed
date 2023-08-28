@@ -4,7 +4,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 import { handleError } from "@/utils/handleError";
 import { trpc } from "@/utils/trpc";
 import { deleteImage, updateImage, uploadImage } from "@/utils/uploadImage";
-import { Loader2, X } from "lucide-react";
+// import { Loader2, X } from "lucide-react";
 import UpdatePost from "./UpdatePost";
 import Divider from "./common/Divider";
 import UpdateProductsList from "./UpdateProductsList";
@@ -22,7 +22,7 @@ import { useUpdatePost } from "@/context/UpdatePostProvider";
 import { useToast } from "./ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Image, Post, Product, _Product } from "@/types";
-import getLoadPostsQueryParams from "./QueryParams/getLoadPostsQueryParams";
+import getLoadPostsQueryParams from "../QueryParams/getLoadPostsQueryParams";
 
 type AddedProduct = {
   title: string;
@@ -210,11 +210,11 @@ export default function CreatePostWindow() {
               {isUpdatingPost ? (
                 <>
                   Updating
-                  <Loader2
+                  {/* <Loader2
                     strokeWidth={2.5}
                     size={14}
                     className="animate-spin"
-                  />
+                  /> */}
                 </>
               ) : (
                 <>Update</>

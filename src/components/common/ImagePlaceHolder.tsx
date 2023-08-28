@@ -2,8 +2,7 @@ import React, { ChangeEvent } from "react";
 import { Label } from "../ui/label";
 import Image, { ImageLoaderProps } from "next/image";
 import { useUploadImage } from "@/hooks/useUploadImage";
-import { Upload, XCircle } from "lucide-react";
-import { useUpdatePost } from "@/context/UpdatePostProvider";
+// import { Upload, } from "lucide-react";
 import useImageUrl from "@/hooks/useImageUrl";
 
 export default function ImagePlaceHolder({
@@ -34,7 +33,7 @@ export default function ImagePlaceHolder({
             htmlFor={id}
             className="absolute inset-0 grid place-items-center place-content-center cursor-pointer"
           >
-            <Upload className="absolute top-1 right-1 z-10 text-slate-500 hover:text-blue-500 cursor-pointer" />
+            {/* <Upload className="absolute top-1 right-1 z-10 text-slate-500 hover:text-blue-500 cursor-pointer" /> */}
           </Label>
           <Image
             loader={({ src }: ImageLoaderProps) => src}

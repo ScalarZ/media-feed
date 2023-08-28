@@ -1,4 +1,3 @@
-import Link from "next/link";
 import React from "react";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 import useImageUrl from "@/hooks/useImageUrl";

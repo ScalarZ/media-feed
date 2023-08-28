@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import CreatePostWindow from "./CreatePostWindow";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+// import { LogOut } from "lucide-react";
 
 export default function Header() {
   const user = useUser();
@@ -64,7 +64,7 @@ function Menu({ children }: { children: React.ReactNode }) {
             router.push("/login");
           }}
         >
-          <LogOut size={14} />
+          {/* <LogOut size={14} /> */}
           <span className="mb-0.5">Sign out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

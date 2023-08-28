@@ -5,7 +5,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 import { handleError } from "@/utils/handleError";
 import { trpc } from "@/utils/trpc";
 import { uploadImage } from "@/utils/uploadImage";
-import { Loader2, X } from "lucide-react";
+// import { Loader2, X } from "lucide-react";
 import CreatePost from "./CreatePost";
 import Divider from "./common/Divider";
 import CreateProductsList from "./CreateProductsList";
@@ -20,7 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import getLoadPostsQueryParams from "./QueryParams/getLoadPostsQueryParams";
+import getLoadPostsQueryParams from "../QueryParams/getLoadPostsQueryParams";
 import useInvalidateQueries from "@/hooks/useInvalidateQueries";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -149,11 +149,11 @@ export default function CreatePostWindow() {
                 {isCreatingPost ? (
                   <>
                     Creating
-                    <Loader2
+                    {/* <Loader2
                       strokeWidth={2.5}
                       size={14}
                       className="animate-spin"
-                    />
+                    /> */}
                   </>
                 ) : (
                   <>Create</>

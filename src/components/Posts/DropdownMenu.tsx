@@ -17,7 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import { Edit, Loader2, MoreVertical, Trash2 } from "lucide-react";
+// import { Edit, Loader2, MoreVertical, Trash2 } from "lucide-react";
 import { DialogTrigger } from "../ui/dialog";
 import { trpc } from "@/utils/trpc";
 import { handleError } from "@/utils/handleError";
@@ -78,7 +78,7 @@ export default function PostSettings({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <MoreVertical className="cursor-pointer" />
+        {/* <MoreVertical className="cursor-pointer" /> */}
       </DropdownMenuTrigger>
       <AlertDialog open={value} onOpenChange={toggle}>
         <DropdownMenuContent side="left" className="p-2">
@@ -88,7 +88,7 @@ export default function PostSettings({
               onClick={setUpEditWindow}
             >
               <span className="text-base">Edit</span>
-              <Edit size={18} />
+              {/* <Edit size={18} /> */}
             </DropdownMenuItem>
           </DialogTrigger>
           <AlertDialogTrigger className="w-full">
@@ -97,7 +97,7 @@ export default function PostSettings({
               onClick={setUpEditWindow}
             >
               <span className="text-base">Delete</span>
-              <Trash2 size={18} />
+              {/* <Trash2 size={18} /> */}
             </DropdownMenuItem>
           </AlertDialogTrigger>
         </DropdownMenuContent>
@@ -136,7 +136,7 @@ function Alert({
             {isLoading ? (
               <>
                 Deleting
-                <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />
+                {/* <Loader2 strokeWidth={2.5} size={14} className="animate-spin" /> */}
               </>
             ) : (
               <>Delete</>
