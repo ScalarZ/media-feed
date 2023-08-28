@@ -11,7 +11,6 @@ import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
 
 const schema = zod.object({
   username: zod.string().min(2, "Username must be at least 2 characters"),
