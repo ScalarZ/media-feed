@@ -2,6 +2,7 @@ import { GetServerSideProps } from "next";
 import { Session, getServerSession } from "next-auth";
 import React from "react";
 import { authOptions } from "./api/auth/[...nextauth]";
+import { getSessionUser } from "@/utils/getUser";
 // import { useUser } from "@/hooks/useUser";
 
 export default function Home({ session }: { session: Session }) {
@@ -19,9 +20,8 @@ export default function Home({ session }: { session: Session }) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerSession(context.req, context.res, authOptions);
+  const user = getSessionUser(session);
   return {
-    props: {
-      session,
-    },
+    props: {},
   };
 };

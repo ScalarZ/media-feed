@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { user } from "@/schema";
 import { eq } from "drizzle-orm";
+import { Session } from "next-auth";
 
 export async function getUserByUsername(username: string) {
   const users = await db
@@ -11,4 +12,8 @@ export async function getUserByUsername(username: string) {
   if (!users.length) throw new Error("No users found");
 
   return users[0];
+}
+
+export function getSessionUser(session: Session | null) {
+  return session?.user;
 }
