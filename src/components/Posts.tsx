@@ -1,19 +1,19 @@
 import React, { useMemo } from "react";
 import Post from "./Posts/Post";
 import { trpc } from "@/utils/trpc";
-import { User } from "@/types";
 import { Loader2 } from "lucide-react";
 import EditPostWindow from "./EditPostWindow";
 import { Dialog } from "./ui/dialog";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 import { useUser } from "@/hooks/useUser";
+import { AuthUser } from "next-auth";
 
 export default function Posts({
   user,
   view = "scroll",
   handleView,
 }: {
-  user: User;
+  user: AuthUser;
   view?: "scroll" | "grid";
   handleView?: (view: "scroll" | "grid") => void;
 }) {

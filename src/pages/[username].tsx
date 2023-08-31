@@ -1,13 +1,13 @@
 import { GetServerSideProps } from "next";
 import Posts from "@/components/Posts";
-import { User } from "@/types";
 import { getUserByUsername } from "@/utils/getUser";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { GalleryVertical, Grid } from "lucide-react";
 import { useState } from "react";
+import { AuthUser } from "next-auth";
 
-function User({ user }: { user: User }) {
+function User({ user }: { user: AuthUser }) {
   const [view, setView] = useState<"scroll" | "grid">("scroll");
 
   function handleView(view: "scroll" | "grid") {

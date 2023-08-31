@@ -2,10 +2,9 @@ import React, { useEffect, useRef } from "react";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 import useImageUrl from "@/hooks/useImageUrl";
 import PostSettings from "./DropdownMenu";
-import { User } from "@/schema";
 import NextImage from "../common/Image";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
-
+import { AuthUser } from "next-auth";
 import type { Post, _Product } from "@/types";
 
 export default function Post({
@@ -21,7 +20,7 @@ export default function Post({
   handleView,
 }: Post & {
   index: number;
-  user?: User;
+  user?: AuthUser;
   view: "scroll" | "grid";
   handleView?: (view: "scroll" | "grid") => void;
 }) {
