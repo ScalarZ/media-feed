@@ -1,17 +1,16 @@
 import { GetServerSideProps } from "next";
-import { Session, getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import React from "react";
 import { authOptions } from "./api/auth/[...nextauth]";
-import { getSessionUser } from "@/utils/getUser";
-// import { useUser } from "@/hooks/useUser";
+import { useUser } from "@/hooks/useUser";
 
-export default function Home({ session }: { session: Session }) {
-  console.log({ session });
+export default function Home() {
+  const user = useUser();
   return (
     <div>
       <h1 className="py-8 text-4xl text-center font-bold">
         Welcome
-        {/* <span className="text-blue-600">{user ? user.name : null}</span>{" "} */}
+        {user ? <span className="mx-2 text-blue-600">{user.name}</span> : null}
         👋
       </h1>
     </div>

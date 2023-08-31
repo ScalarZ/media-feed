@@ -13,8 +13,8 @@ import type { AdapterAccount } from "@auth/core/adapters";
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  username: text("username").unique(),
-  name: text("name"),
+  username: text("username"),
+  name: text("name").notNull().unique(),
   image: text("image"),
   email: text("email").notNull().unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
@@ -75,8 +75,8 @@ export const verificationToken = pgTable(
 
 export const post = pgTable("post", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  title: text("title").notNull(),
-  caption: text("caption").notNull(),
+  title: text("title"),
+  caption: text("caption"),
   createdAt: timestamp("created_at", { withTimezone: true }).default(
     new Date()
   ),
@@ -105,8 +105,8 @@ export const image = pgTable("image", {
 
 export const product = pgTable("product", {
   id: serial("id").primaryKey().notNull(),
-  title: text("title").notNull(),
-  image: text("image").notNull(),
+  title: text("title"),
+  image: text("image"),
   link: text("link").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).default(
     new Date()

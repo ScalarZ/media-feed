@@ -1,13 +1,33 @@
 import { GetServerSideProps } from "next";
-import { getServerSession } from "next-auth";
+import { AuthUser, getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Posts from "@/components/Posts";
-import type { User } from "@/types";
+import { GalleryVertical, Grid } from "lucide-react";
+import { useState } from "react";
 
-export default function Profile({ user }: { user: User }) {
+export default function Profile({ user }: { user: AuthUser }) {
+  const [view, setView] = useState<"scroll" | "grid">("scroll");
+
+  function handleView(view: "scroll" | "grid") {
+    setView(view);
+  }
   return (
-    <main className="relative pb-8 flex flex-col items-center justify-start">
-      {!!user && <Posts user={user} />}
+    <main className="relative pb-8">
+      {!!user && <Posts user={user} view={view} handleView={handleView} />}
+      <div className="fixed bottom-0 py-2 w-full max-w-md border flex justify-center gap-x-6 bg-white z-10">
+        <GalleryVertical
+          className={`p-2 rounded ${
+            view === "scroll" && "bg-slate-200"
+          } cursor-pointer box-content hover:bg-slate-200`}
+          onClick={() => handleView("scroll")}
+        />
+        <Grid
+          className={`p-2 rounded ${
+            view === "grid" && "bg-slate-200"
+          } cursor-pointer box-content hover:bg-slate-200`}
+          onClick={() => handleView("grid")}
+        />
+      </div>
     </main>
   );
 }

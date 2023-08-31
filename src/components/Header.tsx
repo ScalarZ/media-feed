@@ -12,25 +12,32 @@ import { useRouter } from "next/router";
 import CreatePostWindow from "./CreatePostWindow";
 import { Button } from "./ui/button";
 import Link from "next/link";
-// import { LogOut } from "lucide-react";
+import { LogOut, Settings, User, UserCircle } from "lucide-react";
+import useImageUrl from "@/hooks/useImageUrl";
 
 export default function Header() {
   const user = useUser();
+  const imageUrl = useImageUrl(user?.image ?? "", [user]);
+
   return (
-    <header className="py-3 w-full flex justify-between items-center">
+    <header className="sticky top-0 px-4 py-3 w-full flex justify-between items-center bg-white shadow z-10">
       {user ? (
         <>
           <CreatePostWindow />
           <div className="flex items-center gap-x-2">
-            <span className="font-medium">{user.name}</span>
+            <span className="font-medium">{user.username || user.name}</span>
             <Menu>
-              <NextImage
-                src={user.image || ProfilePicture}
-                height={32}
-                width={32}
-                alt={user.name!}
-                className="h-10 w-10 rounded-full object-cover"
-              />
+              {user?.image ? (
+                <NextImage
+                  src={imageUrl}
+                  height={32}
+                  width={32}
+                  alt={user?.name!}
+                  className="h-9 w-9 rounded-full object-cover"
+                />
+              ) : (
+                <UserCircle strokeWidth={1.5} size={36} />
+              )}
             </Menu>
           </div>
         </>
@@ -56,7 +63,19 @@ function Menu({ children }: { children: React.ReactNode }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="-translate-x-1/3">
+        <Link href="/profile">
+          <DropdownMenuItem className="flex items-center gap-x-1 cursor-pointer">
+            <User size={14} />
+            <span className="mb-0.5">My profile</span>
+          </DropdownMenuItem>
+        </Link>
+        <Link href="/settings">
+          <DropdownMenuItem className="flex items-center gap-x-1 cursor-pointer">
+            <Settings size={14} />
+            <span className="mb-0.5">Settings</span>
+          </DropdownMenuItem>
+        </Link>
         <DropdownMenuItem
           className="text-rose-600 flex items-center gap-x-1 cursor-pointer"
           onClick={async () => {
@@ -64,7 +83,7 @@ function Menu({ children }: { children: React.ReactNode }) {
             router.push("/login");
           }}
         >
-          {/* <LogOut size={14} /> */}
+          <LogOut size={14} />
           <span className="mb-0.5">Sign out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -3,31 +3,25 @@ import Posts from "@/components/Posts";
 import { User } from "@/types";
 import { getUserByUsername } from "@/utils/getUser";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]";
-// import { GalleryVertical, Grid } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useRouter } from "next/router";
-import Link from "next/link";
+import { authOptions } from "./api/auth/[...nextauth]";
+import { GalleryVertical, Grid } from "lucide-react";
+import { useState } from "react";
 
 function User({ user }: { user: User }) {
   const [view, setView] = useState<"scroll" | "grid">("scroll");
-  const { push } = useRouter();
-  const viewUrlQuery = useMemo(
-    () => `/user/${user.username}?view=${view}`,
-    [user, view]
-  );
+
   function handleView(view: "scroll" | "grid") {
     setView(view);
-    push(viewUrlQuery);
   }
   return (
-    <div className="py-2">
+    <div className="relative pt-2 pb-20">
       <h1 className="py-2 text-xl text-center font-semibold">
         Welcome to <span className="text-blue-600">{user.username}&apos;s</span>{" "}
         feeds 👋
       </h1>
-      <div className="flex justify-center gap-x-6">
-        {/* <GalleryVertical
+      <Posts user={user} view={view} handleView={handleView} />
+      <div className="fixed bottom-0 py-2 w-full max-w-md border flex justify-center gap-x-6 bg-white z-10">
+        <GalleryVertical
           className={`p-2 rounded ${
             view === "scroll" && "bg-slate-200"
           } cursor-pointer box-content hover:bg-slate-200`}
@@ -38,9 +32,8 @@ function User({ user }: { user: User }) {
             view === "grid" && "bg-slate-200"
           } cursor-pointer box-content hover:bg-slate-200`}
           onClick={() => handleView("grid")}
-        /> */}
+        />
       </div>
-      <Posts user={user} view={view} />
     </div>
   );
 }

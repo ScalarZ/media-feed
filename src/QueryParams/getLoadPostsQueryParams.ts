@@ -1,6 +1,6 @@
-import { User } from "@/schema";
+import { AuthUser } from "next-auth";
 
-export default function getLoadPostsQueryParams(user?: User) {
+export default function getLoadPostsQueryParams(user?: AuthUser) {
   return [
     ["postRouter", "loadPosts"],
     {

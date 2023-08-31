@@ -2,20 +2,20 @@ import React, { useMemo } from "react";
 import Post from "./Posts/Post";
 import { trpc } from "@/utils/trpc";
 import { User } from "@/types";
-// import { Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import EditPostWindow from "./EditPostWindow";
 import { Dialog } from "./ui/dialog";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 import { useUser } from "@/hooks/useUser";
-import GridView from "./Posts/GridView";
-import { Post as PostType } from "@/types";
 
 export default function Posts({
   user,
   view = "scroll",
+  handleView,
 }: {
   user: User;
   view?: "scroll" | "grid";
+  handleView?: (view: "scroll" | "grid") => void;
 }) {
   const { data, isLoading: isLoadingPosts } =
     trpc.postRouter.loadPosts.useQuery({ userId: user.id });
@@ -25,17 +25,20 @@ export default function Posts({
   if (isLoadingPosts)
     return (
       <div className="py-4 flex justify-center">
-        {/* <Loader2 className="animate-spin" /> */}
+        <Loader2 className="animate-spin" />
       </div>
     );
 
   if (!data) return <div className="py-4 text-center">No posts to view</div>;
 
-  if (view === "grid")
-    return <GridView posts={data as unknown as PostType[]} />;
-
+  // if (view === "grid")
+  //   return <GridView posts={data as unknown as PostType[]} />;
   return (
-    <div className="mt-4 grid grid-cols-1 gap-y-4">
+    <div
+      className={`mt-4 grid ${
+        view === "scroll" ? " grid-cols-1 gap-y-4" : " grid-cols-2 gap-1"
+      }`}
+    >
       <Dialog
         onOpenChange={(state) => {
           if (!state) {
@@ -46,7 +49,14 @@ export default function Posts({
         open={toggleValue}
       >
         {data?.map((post, i) => (
-          <Post key={post.id} {...post} index={i} user={userSession} />
+          <Post
+            key={post.id}
+            {...post}
+            index={i}
+            user={userSession}
+            view={view}
+            handleView={handleView}
+          />
         ))}
         <EditPostWindow />
       </Dialog>

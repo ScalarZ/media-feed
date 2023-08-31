@@ -1,8 +1,14 @@
-export type User = {
-  id: string;
-  username: string;
-  email: string;
-};
+import { User } from "next-auth";
+
+declare module "next-auth" {
+  interface AuthUser extends User {
+    email: string;
+    image: string | null;
+    name: string;
+    username: string | null;
+    phone: string | null;
+  }
+}
 
 export type Post = {
   id: string;
@@ -23,15 +29,15 @@ export type Image = {
   postId: string;
 };
 
-export type _Product = {
+export interface _Product {
   id: number;
-  title: string;
+  image: string | null;
   createdAt: string | null;
   updatedAt: string | null;
   link: string;
-  image: string;
+  title: string | null;
   postId: string;
-};
+}
 
 export type Product = {
   title: string;
@@ -41,10 +47,10 @@ export type Product = {
 
 export type DefaultProduct = {
   id: number;
-  title: string;
+  title: string | null;
   link: string;
   image: File | null;
-  defaultTitle: string;
+  defaultTitle: string | null;
   defaultLink: string;
-  defaultImage: string;
+  defaultImage: string | null;
 };

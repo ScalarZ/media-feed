@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "./ui/input";
 import ImagePlaceHolder from "./common/ImagePlaceHolder";
-// import { Image as ImageIcon } from "lucide-react";
+import { Image as ImageIcon } from "lucide-react";
 import { useCreatePost } from "@/context/CreatePostProvider";
 
 export default function CreatePost() {
@@ -22,7 +22,7 @@ export default function CreatePost() {
         }}
       >
         <div className="grid place-items-center">
-          {/* <ImageIcon strokeWidth={1} size={84} /> */}
+          <ImageIcon strokeWidth={1} size={84} />
           <h3 className="text-xl font-semibold">Upload a post image</h3>
         </div>
       </ImagePlaceHolder>

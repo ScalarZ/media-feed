@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "../ui/input";
 import ImagePlaceHolder from "../common/ImagePlaceHolder";
-// import { Image as ImageIcon, Trash, } from "lucide-react";
+import { Image as ImageIcon, Trash } from "lucide-react";
 import { DefaultProduct, Product } from "@/types";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 
@@ -21,26 +21,26 @@ export default function UpdateProduct({
   const { products, defaultProducts, setDeletedProducts } = useUpdatePost();
   return (
     <div className="relative pr-2 flex gap-x-2">
-      {i !== 0 || defaultProducts.length ? (<></>
-        // <Trash
-        //   className="absolute top-1 -right-4 z-10 text-slate-500 hover:text-rose-500 cursor-pointer"
-        //   onClick={() => {
-        //     if (defaultProducts.length <= 1 && products.length < 1) {
-        //       setProducts(() => [{ title: "", link: "", image: null }]);
-        //     }
-        //     if (setDefaultProducts && defaultProduct) {
-        //       setDefaultProducts((prev) =>
-        //         prev.filter((_, index) => index !== i)
-        //       );
-        //       setDeletedProducts((prev) => [
-        //         ...prev,
-        //         { id: defaultProduct.id, image: defaultProduct.defaultImage },
-        //       ]);
-        //     } else {
-        //       setProducts((prev) => prev.filter((_, index) => index !== i));
-        //     }
-        //   }}
-        // />
+      {i !== 0 || defaultProducts.length ? (
+        <Trash
+          className="absolute top-1 -right-4 z-10 text-slate-500 hover:text-rose-500 cursor-pointer"
+          onClick={() => {
+            if (defaultProducts.length <= 1 && products.length < 1) {
+              setProducts(() => [{ title: "", link: "", image: null }]);
+            }
+            if (setDefaultProducts && defaultProduct) {
+              setDefaultProducts((prev) =>
+                prev.filter((_, index) => index !== i)
+              );
+              setDeletedProducts((prev) => [
+                ...prev,
+                { id: defaultProduct.id, image: defaultProduct.defaultImage },
+              ]);
+            } else {
+              setProducts((prev) => prev.filter((_, index) => index !== i));
+            }
+          }}
+        />
       ) : null}
       <div className="w-24">
         <ImagePlaceHolder
@@ -63,7 +63,7 @@ export default function UpdateProduct({
           }}
         >
           <div className="grid place-items-center">
-            {/* <ImageIcon strokeWidth={2} size={28} /> */}
+            <ImageIcon strokeWidth={2} size={28} />
             <h3 className="text-xs">Upload image</h3>
           </div>
         </ImagePlaceHolder>
@@ -82,7 +82,7 @@ export default function UpdateProduct({
                   return [...prev];
                 })
           }
-          defaultValue={defaultProduct?.title}
+          defaultValue={defaultProduct?.title ?? ""}
         />
         <Input
           placeholder="Add a product link"

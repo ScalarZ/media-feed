@@ -21,6 +21,7 @@ export const postRouter = router({
             image: z.string(),
           })
         ),
+        createdAt: z.number(),
       })
     )
     .mutation(
@@ -31,6 +32,7 @@ export const postRouter = router({
           postCaption,
           postImage,
           products,
+          createdAt,
         },
         ctx: { db },
       }) => {
@@ -40,6 +42,7 @@ export const postRouter = router({
             title: postTitle,
             caption: postCaption,
             userId,
+            createdAt: new Date(createdAt),
           })
           .returning();
 
@@ -171,11 +174,12 @@ export const postRouter = router({
                   .where(inArray(product.id, sql.ids))
               : undefined,
             deletedProducts
-              ? db
-                  .delete(product)
-                  .where(
-                    and(...deletedProducts.map(({ id }) => eq(product.id, id)))
+              ? db.delete(product).where(
+                  inArray(
+                    product.id,
+                    deletedProducts.map(({ id }) => id)
                   )
+                )
               : undefined,
           ]);
 

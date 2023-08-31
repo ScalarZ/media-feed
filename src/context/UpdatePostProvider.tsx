@@ -20,11 +20,11 @@ interface Context {
   setPostImage: (value: File | null) => void;
   products: Product[];
   setProducts: (cb: (product: Product[]) => Product[]) => void;
-  deletedProducts: { id: number; image: string }[];
+  deletedProducts: { id: number; image: string | null }[];
   setDeletedProducts: (
     cb: (
-      product: { id: number; image: string }[]
-    ) => { id: number; image: string }[]
+      product: { id: number; image: string | null }[]
+    ) => { id: number; image: string | null }[]
   ) => void;
   defaultPostImage: string;
   setDefaultPostImage: (value: string) => void;
@@ -54,7 +54,7 @@ export default function UpdatePostProvider({
   const [defaultPostImage, setDefaultPostImage] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [deletedProducts, setDeletedProducts] = useState<
-    { id: number; image: string }[]
+    { id: number; image: string | null }[]
   >([]);
   const [defaultProducts, setDefaultProducts] = useState<DefaultProduct[]>([]);
   const [toggleValue, toggle] = useToggle(false);

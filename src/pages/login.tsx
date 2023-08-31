@@ -9,7 +9,7 @@ import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { useRouter } from "next/router";
-// import { Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 
@@ -59,8 +59,7 @@ export default function Register() {
             </Label>
             <Button type="submit" className="mt-2 flex gap-x-2 font-semibold">
               {isLoading && (
-                // <Loader2 size={18} strokeWidth={3} className="animate-spin" />
-                <>loading...</>
+                <Loader2 size={18} strokeWidth={3} className="animate-spin" />
               )}
               Login
             </Button>

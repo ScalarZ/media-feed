@@ -1,7 +1,7 @@
 import React from "react";
 import { Input } from "../ui/input";
 import ImagePlaceHolder from "../common/ImagePlaceHolder";
-// import { Image as ImageIcon, Trash, XCircle } from "lucide-react";
+import { Image as ImageIcon, Trash, XCircle } from "lucide-react";
 import { Product } from "@/types";
 
 export default function CreateProduct({
@@ -14,13 +14,12 @@ export default function CreateProduct({
   return (
     <div className="relative pr-2 flex gap-x-2">
       {i !== 0 && (
-        // <Trash
-        //   className="absolute top-1 -right-4 z-10 text-slate-500 hover:text-rose-500 cursor-pointer"
-        //   onClick={() => {
-        //     setProducts((prev) => prev.filter((_, index) => index !== i));
-        //   }}
-        // />
-        <></>
+        <Trash
+          className="absolute top-1 -right-4 z-10 text-slate-500 hover:text-rose-500 cursor-pointer"
+          onClick={() => {
+            setProducts((prev) => prev.filter((_, index) => index !== i));
+          }}
+        />
       )}
       <div className="w-24">
         <ImagePlaceHolder
@@ -36,7 +35,7 @@ export default function CreateProduct({
           }}
         >
           <div className="grid place-items-center">
-            {/* <ImageIcon strokeWidth={2} size={28} /> */}
+            <ImageIcon strokeWidth={2} size={28} />
             <h3 className="text-xs">Upload image</h3>
           </div>
         </ImagePlaceHolder>

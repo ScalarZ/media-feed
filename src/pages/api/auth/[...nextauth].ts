@@ -24,7 +24,7 @@ export const authOptions: NextAuthOptions = {
         try {
           const { data: user, error } = (await supabase
             .from("user")
-            .select("id, email, username")
+            .select("id, email, username, name, phone, image")
             .match({
               email: credentials?.email!,
               password: credentials?.password!,
@@ -56,12 +56,14 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
+      if (trigger === "update") {
+        return { ...token, ...session.user };
+      }
       return { ...token, ...user };
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       session.user = token;
-
       return session;
     },
   },

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
-// import { Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
@@ -32,16 +32,19 @@ export default function Register() {
     resolver: zodResolver(schema),
   });
   async function onSubmit(data: RegisterData) {
-    mutate(data, {
-      onSuccess: ({ message }) => {
-        toast({
-          description: message,
-        });
-      },
-      onError: ({ message }) => {
-        console.log({ message });
-      },
-    });
+    mutate(
+      { ...data, createdAt: Date.now() },
+      {
+        onSuccess: ({ message }) => {
+          toast({
+            description: message,
+          });
+        },
+        onError: ({ message }) => {
+          console.log({ message });
+        },
+      }
+    );
   }
   return (
     <div className="px-4 min-h-screen grid place-items-center">
@@ -73,8 +76,7 @@ export default function Register() {
             </Label>
             <Button type="submit" className="mt-2 flex gap-x-2 font-semibold">
               {isLoading && (
-                // <Loader2 size={16} strokeWidth={3} className="animate-spin" />
-                <>loading</>
+                <Loader2 size={16} strokeWidth={3} className="animate-spin" />
               )}
               Create
             </Button>

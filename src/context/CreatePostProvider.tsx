@@ -34,7 +34,7 @@ export default function CreatePostProvider({
     setPostTitle("");
     setPostCaption("");
     setPostImage(null);
-    setProducts([]);
+    setProducts([{ title: "", image: null, link: "" }]);
   }
   return (
     <context.Provider

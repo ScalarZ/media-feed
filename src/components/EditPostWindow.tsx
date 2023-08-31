@@ -4,7 +4,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 import { handleError } from "@/utils/handleError";
 import { trpc } from "@/utils/trpc";
 import { deleteImage, updateImage, uploadImage } from "@/utils/uploadImage";
-// import { Loader2, X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import UpdatePost from "./UpdatePost";
 import Divider from "./common/Divider";
 import UpdateProductsList from "./UpdateProductsList";
@@ -21,8 +21,8 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 import { useToast } from "./ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
-import { Image, Post, Product, _Product } from "@/types";
-import getLoadPostsQueryParams from "../QueryParams/getLoadPostsQueryParams";
+import { Post, _Product } from "@/types";
+import getLoadPostsQueryParams from "@/QueryParams/getLoadPostsQueryParams";
 
 type AddedProduct = {
   title: string;
@@ -71,16 +71,9 @@ export default function CreatePostWindow() {
     return (
       !user ||
       !postId ||
-      !postTitle ||
-      !postCaption ||
       (!postImage && !defaultPostImage) ||
-      (!!products.length &&
-        products.some(({ image, link, title }) => !image || !link || !title)) ||
-      (!!defaultProducts.length &&
-        defaultProducts.some(
-          ({ image, link, title, defaultImage }) =>
-            (!image && !defaultImage) || !link || !title
-        ))
+      (!!products.length && products.some(({ link }) => !link)) ||
+      (!!defaultProducts.length && defaultProducts.some(({ link }) => !link))
     );
   }
   async function handleUpdatePost() {
@@ -98,7 +91,7 @@ export default function CreatePostWindow() {
         ? updateImage("posts", postImage, defaultPostImage)
         : undefined,
       ...defaultProducts.map(({ image, defaultImage }) => {
-        if (!image) return;
+        if (!image || !defaultImage) return;
         return updateImage("products", image, defaultImage);
       }),
       ...products.map(({ image }) => {
@@ -210,11 +203,11 @@ export default function CreatePostWindow() {
               {isUpdatingPost ? (
                 <>
                   Updating
-                  {/* <Loader2
+                  <Loader2
                     strokeWidth={2.5}
                     size={14}
                     className="animate-spin"
-                  /> */}
+                  />
                 </>
               ) : (
                 <>Update</>

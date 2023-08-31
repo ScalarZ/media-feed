@@ -64,20 +64,22 @@ function PostView({
   );
 }
 
-function Product({ id, image, title }: _Product) {
+function Product({ id, image, title, link }: _Product) {
   const imageUrl = useImageUrl(image ?? "");
   return (
     <div className="p-2 border flex gap-x-4 hover:bg-slate-100">
-      <div className="relative w-16">
-        <NextImage
-          src={imageUrl}
-          height={300}
-          width={500}
-          alt={id.toString()}
-        />
-      </div>
+      {image ? (
+        <div className="relative w-16">
+          <NextImage
+            src={imageUrl}
+            height={300}
+            width={500}
+            alt={id.toString()}
+          />
+        </div>
+      ) : null}
       <div className="flex-grow space-y-2 flex items-center">
-        <h3 className="font-medium">{title}</h3>
+        <h3 className="font-medium">{title || link}</h3>
       </div>
     </div>
   );
