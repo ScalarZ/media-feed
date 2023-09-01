@@ -13,11 +13,12 @@ import type { AdapterAccount } from "@auth/core/adapters";
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  username: text("username"),
-  name: text("name").notNull().unique(),
+  displayName: text("display_name"),
+  username: text("username").notNull().unique(),
   image: text("image"),
   email: text("email").notNull().unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
+  isEmailVerified: boolean("is_verified").default(false),
   phone: text("phone"),
   password: text("password"),
   isAdmin: boolean("is_admin").default(false),
@@ -61,17 +62,15 @@ export const session = pgTable("session", {
   expires: timestamp("expires", { mode: "date" }).notNull(),
 });
 
-export const verificationToken = pgTable(
-  "verificationToken",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
-  },
-  (vt) => ({
-    compoundKey: primaryKey(vt.identifier, vt.token),
-  })
-);
+export const verificationToken = pgTable("verificationToken", {
+  id: serial("id").primaryKey().notNull(),
+  token: text("token").notNull(),
+  issuedAt: timestamp("issued_at", { mode: "date" }).notNull(),
+  expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
+  userId: uuid("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
 
 export const post = pgTable("post", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),

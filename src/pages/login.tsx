@@ -21,10 +21,12 @@ const schema = zod.object({
 type RegisterData = zod.infer<typeof schema>;
 
 export default function Register() {
-  const { push } = useRouter();
+  const { replace } = useRouter();
+  const [isAccountValid, setIsAccountValid] = useState(true);
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<RegisterData>({
     resolver: zodResolver(schema),
@@ -32,12 +34,19 @@ export default function Register() {
   const [isLoading, setIsLoading] = useState(false);
   async function onSubmit(data: RegisterData) {
     setIsLoading((prev) => !prev);
-    const res = await signIn("credentials", { ...data, redirect: false });
-    setIsLoading((prev) => !prev);
-    push("/profile");
+    try {
+      const res = await signIn("credentials", { ...data, redirect: false });
+      if (!res || !res.ok) throw new Error("Invalid credentials");
+      replace("/profile");
+    } catch (err) {
+      setIsAccountValid(false);
+    } finally {
+      reset();
+      setIsLoading((prev) => !prev);
+    }
   }
   return (
-    <div className="px-4 min-h-screen grid place-items-center">
+    <div className="px-4 py-10 grid place-items-center">
       <Card className="mx-auto pb-4 max-w-lg w-full border shadow-slate-200 shadow-md dark:shadow-slate-950">
         <CardHeader>
           <CardTitle className="text-center">Sign in</CardTitle>
@@ -88,6 +97,11 @@ export default function Register() {
           </div>
         </CardContent>
       </Card>
+      {!isAccountValid && (
+        <p className="mt-4 text-center text-destructive">
+          ❌ Invalid credentials, please try again
+        </p>
+      )}
     </div>
   );
 }

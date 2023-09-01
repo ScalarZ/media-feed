@@ -11,7 +11,9 @@ import { GetServerSideProps } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useEffect, useState } from "react";
+import { handleError } from "@/utils/handleError";
 
 const schema = zod.object({
   username: zod.string().min(2, "Username must be at least 2 characters"),
@@ -23,31 +25,77 @@ type RegisterData = zod.infer<typeof schema>;
 
 export default function Register() {
   const { toast } = useToast();
-  const { mutate, isLoading } = trpc.userRouter.register.useMutation();
+  const [isUsernameValid, setIsUsernameValid] = useState<Boolean | null>(null);
+  const [isEmailValid, setIsEmailValid] = useState<Boolean | null>(null);
+  const [isSingUp, setIsSignUp] = useState(false);
+
+  const { mutate: signUp, isLoading: isSingingUp } =
+    trpc.userRouter.register.useMutation();
+  const { mutate: checkUsername, isLoading: isChecking } =
+    trpc.userRouter.checkUsername.useMutation();
+
   const {
     register,
     handleSubmit,
+    watch,
+    reset,
     formState: { errors },
   } = useForm<RegisterData>({
     resolver: zodResolver(schema),
   });
   async function onSubmit(data: RegisterData) {
-    mutate(
+    if (!isUsernameValid) return;
+    signUp(
       { ...data, createdAt: Date.now() },
       {
         onSuccess: ({ message }) => {
           toast({
             description: message,
+            className: "text-green-500",
           });
+          reset();
         },
-        onError: ({ message }) => {
-          console.log({ message });
+        onError: (error) => {
+          const messageError =
+            'duplicate key value violates unique constraint "user_email_unique"';
+          if (error.message === messageError) {
+            toast({
+              description: "This email has already been taken",
+              className: "text-destructive",
+            });
+            setIsEmailValid(false);
+          }
+          handleError(error);
         },
       }
     );
   }
+  const debouncedValue = useDebounce<string>(watch("username"), 500);
+
+  useEffect(() => {
+    if (debouncedValue) {
+      checkUsername(
+        {
+          username: debouncedValue,
+        },
+        {
+          onSuccess: ({ valid, message }) => {
+            setIsUsernameValid(valid);
+            toast({
+              description: message,
+              className: valid ? "text-green-500" : "text-destructive",
+            });
+          },
+          onError: (error) => handleError(error),
+        }
+      );
+    } else {
+      setIsUsernameValid(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedValue]);
   return (
-    <div className="px-4 min-h-screen grid place-items-center">
+    <div className="px-4 py-10 grid place-items-center">
       <Card className="mx-auto pb-4 max-w-lg w-full border shadow-slate-200 shadow-md dark:shadow-slate-950">
         <CardHeader>
           <CardTitle className="text-center">Sign up</CardTitle>
@@ -62,10 +110,30 @@ export default function Register() {
               label="Username"
               error={errors.username?.message}
             >
-              <Input id="username" {...register("username")} />
+              <Input
+                id="username"
+                {...register("username")}
+                className={`${
+                  isUsernameValid !== null
+                    ? isUsernameValid
+                      ? "border-2 border-green-500"
+                      : "border-2 border-red-500"
+                    : ""
+                }`}
+              />
             </Label>
             <Label htmlFor="email" label="Email" error={errors.email?.message}>
-              <Input id="email" {...register("email")} />
+              <Input
+                id="email"
+                {...register("email")}
+                className={`${
+                  isEmailValid !== null
+                    ? isEmailValid
+                      ? "border-2 border-green-500"
+                      : "border-2 border-red-500"
+                    : ""
+                }`}
+              />
             </Label>
             <Label
               htmlFor="password"
@@ -75,7 +143,7 @@ export default function Register() {
               <Input type="password" id="password" {...register("password")} />
             </Label>
             <Button type="submit" className="mt-2 flex gap-x-2 font-semibold">
-              {isLoading && (
+              {isSingingUp && (
                 <Loader2 size={16} strokeWidth={3} className="animate-spin" />
               )}
               Create
@@ -88,6 +156,11 @@ export default function Register() {
           </div>
         </CardContent>
       </Card>
+      {isSingingUp && (
+        <p className="mt-4 text-center">
+          We will email you once your account gets verified by the admin 😀
+        </p>
+      )}
     </div>
   );
 }

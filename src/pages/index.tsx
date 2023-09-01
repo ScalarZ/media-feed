@@ -10,7 +10,11 @@ export default function Home() {
     <div>
       <h1 className="py-8 text-4xl text-center font-bold">
         Welcome
-        {user ? <span className="mx-2 text-blue-600">{user.name}</span> : null}
+        {user ? (
+          <span className="mx-2 text-blue-600">
+            {user.username || user.name}
+          </span>
+        ) : null}
         👋
       </h1>
     </div>

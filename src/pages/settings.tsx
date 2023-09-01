@@ -40,7 +40,7 @@ const accountFormSchema = z.object({
     .max(30, {
       message: "Username must not be longer than 30 characters.",
     }),
-  displayname: z.string().max(30, {
+  displayName: z.string().max(30, {
     message: "Displayname must not be longer than 30 characters.",
   }),
   phone: z.string().regex(/^(\d{10}|)$/, "Phone must be at least 10 digits."),
@@ -54,10 +54,13 @@ export default function Settings() {
   const user = useUser();
   const { data: session, update } = useSession();
   const { mutate: updateAccount } = trpc.userRouter.update.useMutation();
+  const { mutate: resetPassword, isLoading: isResettingPassword } =
+    trpc.userRouter.resetPassword.useMutation();
   const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
+
   const defaultValues: Partial<AccountFormValues> = {
     username: user?.name ?? "",
-    displayname: user?.username ?? "",
+    displayName: user?.username ?? "",
     phone: user?.phone ?? "",
     email: user?.email ?? "",
   };
@@ -88,9 +91,7 @@ export default function Settings() {
         onError: (error) => handleError(error),
         onSuccess: ({ message }) => {
           const newSession = {
-            name: data.username,
-            username: data.displayname,
-            phone: data.phone,
+            ...data,
             image: newProfilePicture !== null ? newProfilePicture : user.image,
           };
           update({
@@ -136,6 +137,28 @@ export default function Settings() {
     return null;
   }
 
+  function handleResetPassword() {
+    if (!user) return;
+    resetPassword(
+      {
+        userId: user.id,
+        name: user.name,
+        email: user.email,
+        origin: location.origin,
+      },
+      {
+        onError: (error) => handleError(error),
+        onSuccess: ({ message }) => {
+          toast({
+            title: message,
+            className: "text-green-500",
+          });
+        },
+        onSettled: () => setIsUpdatingAccount(false),
+      }
+    );
+  }
+
   return (
     <div className="px-4 pt-4 pb-8">
       <h1 className="text-xl font-semibold">Account</h1>
@@ -173,7 +196,7 @@ export default function Settings() {
           />
           <FormField
             control={form.control}
-            name="displayname"
+            name="displayName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold">Display name</FormLabel>
@@ -276,14 +299,15 @@ export default function Settings() {
         type="button"
         variant="destructive"
         className="mt-4 flex items-center gap-x-1"
+        onClick={handleResetPassword}
       >
-        {isUpdatingAccount ? (
+        {isResettingPassword ? (
           <>
             Change password
-            <Loader2 strokeWidth={2.5} size={14} className=" animate-spin" />
+            <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />
           </>
         ) : (
-          <>Change password</>
+          <> Change password</>
         )}
       </Button>
     </div>
