@@ -1,12 +1,13 @@
 import { User } from "next-auth";
-
 declare module "next-auth" {
   interface AuthUser extends User {
     email: string;
     image: string | null;
+    displayname: string;
     name: string;
-    username: string | null;
     phone: string | null;
+    isEmailVerified: boolean;
+    isAdmin: boolean;
   }
 }
 
@@ -14,10 +15,11 @@ export type Post = {
   id: string;
   createdAt: string;
   updatedAt: string;
-  title: string;
-  caption: string;
+  title: string | null;
+  caption: string | null;
   userId: string;
   image: Image;
+  status: "PENDING" | "PUBLISHED" | "REJECTED";
   product: _Product[];
 };
 
@@ -40,7 +42,7 @@ export interface _Product {
 }
 
 export type Product = {
-  title: string;
+  title: string | null;
   link: string;
   image: File | null;
 };

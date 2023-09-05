@@ -21,7 +21,7 @@ export default function GridView({ posts }: { posts: Post[] }) {
             <div className="relative aspect-square cursor-pointer hover:opacity-90">
               <NextImage
                 src={post.image.url}
-                alt={post.title}
+                alt={post.title ?? "#"}
                 fill={true}
                 className="object-cover"
               />
@@ -46,7 +46,7 @@ function PostView({
           <DialogTitle>{title}</DialogTitle>
         </div>
       </DialogHeader>
-      <NextImage src={image.url} height={300} width={600} alt={title} />
+      <NextImage src={image.url} height={300} width={600} alt={title ?? "#"} />
       <p className="px-4">{caption}</p>
       <div className="px-4 flex-grow">
         {products.map((product) => (

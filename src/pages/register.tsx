@@ -27,7 +27,6 @@ export default function Register() {
   const { toast } = useToast();
   const [isUsernameValid, setIsUsernameValid] = useState<Boolean | null>(null);
   const [isEmailValid, setIsEmailValid] = useState<Boolean | null>(null);
-  const [isSingUp, setIsSignUp] = useState(false);
 
   const { mutate: signUp, isLoading: isSingingUp } =
     trpc.userRouter.register.useMutation();
@@ -70,6 +69,7 @@ export default function Register() {
       }
     );
   }
+
   const debouncedValue = useDebounce<string>(watch("username"), 500);
 
   useEffect(() => {
@@ -150,7 +150,7 @@ export default function Register() {
             </Button>
           </form>
           <div className="mt-4 text-center">
-            <Link href="/login" className="">
+            <Link href="/login" className="text-sm">
               Sing in
             </Link>
           </div>
@@ -191,14 +191,14 @@ function ErrorHandler({ message }: { message?: string }) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerSession(context.req, context.res, authOptions);
-  // if (session) {
-  //   return {
-  //     redirect: {
-  //       destination: "/",
-  //       permanent: false,
-  //     },
-  //   };
-  // }
+  if (session) {
+    return {
+      redirect: {
+        destination: "/profile",
+        permanent: false,
+      },
+    };
+  }
   return {
     props: {
       session,

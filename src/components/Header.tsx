@@ -12,8 +12,9 @@ import { useRouter } from "next/router";
 import CreatePostWindow from "./CreatePostWindow";
 import { Button } from "./ui/button";
 import Link from "next/link";
-import { LogOut, Settings, User, UserCircle } from "lucide-react";
+import { LogOut, Settings, User, UserCircle, Shield } from "lucide-react";
 import useImageUrl from "@/hooks/useImageUrl";
+import { AuthUser } from "next-auth";
 
 export default function Header() {
   const user = useUser();
@@ -25,8 +26,8 @@ export default function Header() {
         <>
           <CreatePostWindow />
           <div className="flex items-center gap-x-2">
-            <span className="font-medium">{user.username || user.name}</span>
-            <Menu>
+            <span className="font-medium">{user.displayname || user.name}</span>
+            <Menu user={user}>
               {user?.image ? (
                 <NextImage
                   src={imageUrl}
@@ -58,7 +59,13 @@ export default function Header() {
   );
 }
 
-function Menu({ children }: { children: React.ReactNode }) {
+function Menu({
+  user,
+  children,
+}: {
+  user: AuthUser;
+  children: React.ReactNode;
+}) {
   const router = useRouter();
   return (
     <DropdownMenu>
@@ -76,10 +83,18 @@ function Menu({ children }: { children: React.ReactNode }) {
             <span className="mb-0.5">Settings</span>
           </DropdownMenuItem>
         </Link>
+        {user.isAdmin && (
+          <Link href="/admin-portal">
+            <DropdownMenuItem className="flex items-center gap-x-1 cursor-pointer">
+              <Shield size={14} />
+              <span className="mb-0.5">Admin portal</span>
+            </DropdownMenuItem>
+          </Link>
+        )}
         <DropdownMenuItem
           className="text-rose-600 flex items-center gap-x-1 cursor-pointer"
           onClick={async () => {
-            await signOut();
+            await signOut({ redirect: false });
             router.push("/login");
           }}
         >

@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { procedure, router } from "../trpc";
-import { Product, image, post, product } from "@/schema";
+import { image, post, product, user } from "@/schema";
 import { TRPCError } from "@trpc/server";
-import { SQL, and, asc, desc, eq, inArray } from "drizzle-orm";
+import { SQL, and, eq, gte, ilike, inArray, lte } from "drizzle-orm";
 import { Post } from "@/types";
 import { getSQL } from "@/utils/getSQL";
 
@@ -229,9 +229,92 @@ export const postRouter = router({
             product: true,
           },
           orderBy: (post, { asc, desc }) => [desc(post.createdAt)],
+          where: eq(post.userId, userId),
         });
 
         return posts as unknown as Post[];
+      } catch (err) {
+        console.log(err);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: err,
+        });
+      }
+    }),
+  searchPosts: procedure
+    .input(
+      z.object({
+        username: z.string().optional(),
+        dateRange: z.object({ from: z.string(), to: z.string() }).optional(),
+        status: z.enum(["PENDING", "PUBLISHED", "REJECTED"]).optional(),
+      })
+    )
+    .mutation(
+      async ({ input: { username, dateRange, status }, ctx: { db } }) => {
+        try {
+          let users: { id: string }[] = [];
+          if (username) {
+            users = await db
+              .select({ id: user.id })
+              .from(user)
+              .where(ilike(user.name, `%${username}%`));
+          }
+          const posts = await db.query.post.findMany({
+            with: {
+              user: {
+                columns: {
+                  id: true,
+                  name: true,
+                },
+              },
+              image: true,
+              product: true,
+            },
+            where: and(
+              users.length
+                ? inArray(
+                    post.userId,
+                    users.map(({ id }) => id)
+                  )
+                : undefined,
+              status ? eq(post.status, status) : undefined,
+              dateRange
+                ? and(
+                    gte(post.createdAt, new Date(dateRange.from)),
+                    lte(post.createdAt, new Date(dateRange.to))
+                  )
+                : undefined
+            ),
+          });
+
+          return posts;
+        } catch (err) {
+          console.log(err);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "An unexpected error occurred, please try again later.",
+            cause: err,
+          });
+        }
+      }
+    ),
+  updateStatus: procedure
+    .input(
+      z.object({
+        postId: z.string(),
+        status: z.enum(["PENDING", "PUBLISHED", "REJECTED"]),
+      })
+    )
+    .mutation(async ({ input: { postId, status }, ctx: { db } }) => {
+      try {
+        const posts = await db
+          .update(post)
+          .set({ status })
+          .where(eq(post.id, postId));
+        return {
+          message: "Post status has been updated successfully",
+        };
       } catch (err) {
         console.log(err);
         throw new TRPCError({

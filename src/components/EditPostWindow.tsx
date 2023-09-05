@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import { getImageUrl } from "@/utils/getImageUrl";
 import { handleError } from "@/utils/handleError";
@@ -23,6 +23,8 @@ import { useToast } from "./ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Post, _Product } from "@/types";
 import getLoadPostsQueryParams from "@/QueryParams/getLoadPostsQueryParams";
+import clsx from "clsx";
+import { DataPost } from "@/pages/admin-portal";
 
 type AddedProduct = {
   title: string;
@@ -40,11 +42,16 @@ function isPostList(data: unknown): data is Post[] {
   return !!data && typeof data === "object" && Array.isArray(data);
 }
 
-export default function CreatePostWindow() {
+export default function EditPostWindow({
+  setData,
+}: {
+  setData?: Dispatch<SetStateAction<DataPost[]>>;
+}) {
   const user = useUser();
   const { toast } = useToast();
   const {
     postIndex,
+    postUserId,
     postId,
     postTitle,
     postCaption,
@@ -58,11 +65,16 @@ export default function CreatePostWindow() {
     deletedProducts,
     toggle,
     resetStates,
+    status,
   } = useUpdatePost();
   const queryClient = useQueryClient();
   const { mutate: updatePost } = trpc.postRouter.updatePost.useMutation();
+  const { mutate: updateStatus, isLoading: isUpdatingStatus } =
+    trpc.postRouter.updateStatus.useMutation();
   const [isUpdatingPost, setIsUpdatingPost] = useState(false);
-
+  const [updatedStatus, setUpdatedStatus] = useState<
+    "PENDING" | "PUBLISHED" | "REJECTED"
+  >("PENDING");
   const loadPostsQueryParams = useMemo(
     () => getLoadPostsQueryParams(user),
     [user]
@@ -138,11 +150,14 @@ export default function CreatePostWindow() {
     updatePost(
       {
         postId,
-        postTitle: postTitle !== defaultPostTitle ? postTitle : undefined,
+        postTitle:
+          postTitle && postTitle !== defaultPostTitle ? postTitle : undefined,
         postCaption:
-          postCaption !== defaultPostCaption ? postCaption : undefined,
+          postCaption && postCaption !== defaultPostCaption
+            ? postCaption
+            : undefined,
         postImage: updatedImage,
-        userId: user?.id!,
+        userId: postUserId,
         addedProducts: addedProducts.length
           ? (addedProducts as AddedProduct[])
           : undefined,
@@ -160,21 +175,95 @@ export default function CreatePostWindow() {
             description: message,
             className: "text-green-500",
           });
-          resetStates();
-          toggle();
-          setIsUpdatingPost(false);
+          if (!user?.isAdmin) {
+            toggle();
+            resetStates();
+          }
         },
         onError: handleError,
+        onSettled: () => setIsUpdatingPost(false),
       }
     );
   }
-
+  function handleUpdateStatus(status: "PENDING" | "PUBLISHED" | "REJECTED") {
+    setUpdatedStatus(status);
+    updateStatus(
+      {
+        postId,
+        status,
+      },
+      {
+        onSuccess: async ({ message }) => {
+          toast({
+            description: message,
+          });
+          resetStates();
+          toggle();
+          if (setData)
+            setData((prev) => {
+              prev[postIndex].status = status;
+              return [...prev];
+            });
+        },
+        onError: handleError,
+        onSettled: () => setUpdatedStatus("PUBLISHED"),
+      }
+    );
+  }
   return (
     <DialogContent className="overflow-y-auto h-screen max-w-md">
       <DialogHeader>
         <div className="flex justify-between items-center">
-          <DialogTitle>Create poste</DialogTitle>
+          <DialogTitle>Edit post</DialogTitle>
+          <span
+            className={clsx("px-4 text-sm", {
+              "text-green-500": status === "PUBLISHED",
+              "text-destructive": status === "REJECTED",
+            })}
+          >
+            {status}
+          </span>
         </div>
+        {user?.isAdmin && (
+          <div className="w-full flex justify-center gap-x-2">
+            <Button
+              className="bg-destructive flex items-center gap-x-1 hover:bg-red-600"
+              onClick={() => handleUpdateStatus("REJECTED")}
+              disabled={status === "REJECTED"}
+            >
+              {updatedStatus === "REJECTED" && isUpdatingStatus ? (
+                <>
+                  Rejecting
+                  <Loader2
+                    strokeWidth={2.5}
+                    size={14}
+                    className="animate-spin"
+                  />
+                </>
+              ) : (
+                <>Reject</>
+              )}
+            </Button>
+            <Button
+              className="bg-green-500 flex items-center gap-x-1 hover:bg-green-600"
+              onClick={() => handleUpdateStatus("PUBLISHED")}
+              disabled={status === "PUBLISHED"}
+            >
+              {updatedStatus === "PUBLISHED" && isUpdatingStatus ? (
+                <>
+                  Publishing
+                  <Loader2
+                    strokeWidth={2.5}
+                    size={14}
+                    className="animate-spin"
+                  />
+                </>
+              ) : (
+                <>Publish</>
+              )}
+            </Button>
+          </div>
+        )}
       </DialogHeader>
       <UpdatePost />
       <Divider />

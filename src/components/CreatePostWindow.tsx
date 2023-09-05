@@ -73,7 +73,7 @@ export default function CreatePostWindow() {
       if (res[0].error) throw res[0].error;
 
       const productsList = products.map(({ title, link }, i) => ({
-        title,
+        title: title ?? "",
         link,
         image: getImageUrl("products", res[i + 1].data?.path) ?? "",
       }));
@@ -115,7 +115,7 @@ export default function CreatePostWindow() {
       <DialogContent className="overflow-y-scroll h-screen max-w-md">
         <DialogHeader>
           <div className="flex justify-between items-center">
-            <DialogTitle>Create poste</DialogTitle>
+            <DialogTitle>Create post</DialogTitle>
           </div>
         </DialogHeader>
         <CreatePost />

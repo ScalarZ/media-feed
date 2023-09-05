@@ -8,14 +8,16 @@ interface Context {
   setPostIndex: (value: number) => void;
   postId: string;
   setPostId: (value: string) => void;
-  postTitle: string;
-  setPostTitle: (value: string) => void;
-  postCaption: string;
-  setDefaultPostCaption: (value: string) => void;
-  defaultPostTitle: string;
-  setDefaultPostTitle: (value: string) => void;
-  defaultPostCaption: string;
-  setPostCaption: (value: string) => void;
+  postUserId: string;
+  setPostUserId: (value: string) => void;
+  postTitle: string | null;
+  setPostTitle: (value: string | null) => void;
+  postCaption: string | null;
+  setDefaultPostCaption: (value: string | null) => void;
+  defaultPostTitle: string | null;
+  setDefaultPostTitle: (value: string | null) => void;
+  defaultPostCaption: string | null;
+  setPostCaption: (value: string | null) => void;
   postImage: File | null;
   setPostImage: (value: File | null) => void;
   products: Product[];
@@ -32,6 +34,8 @@ interface Context {
   setDefaultProducts: (
     cb: (product: DefaultProduct[]) => DefaultProduct[]
   ) => void;
+  status: "PENDING" | "PUBLISHED" | "REJECTED";
+  setStatus: (status: "PENDING" | "PUBLISHED" | "REJECTED") => void;
   toggleValue: boolean;
   toggle: () => void;
   resetStates: () => void;
@@ -46,10 +50,13 @@ export default function UpdatePostProvider({
 }) {
   const [postIndex, setPostIndex] = useState(-1);
   const [postId, setPostId] = useState<string>("");
-  const [postTitle, setPostTitle] = useState("");
-  const [defaultPostTitle, setDefaultPostTitle] = useState("");
-  const [postCaption, setPostCaption] = useState("");
-  const [defaultPostCaption, setDefaultPostCaption] = useState("");
+  const [postUserId, setPostUserId] = useState<string>("");
+  const [postTitle, setPostTitle] = useState<string | null>(null);
+  const [defaultPostTitle, setDefaultPostTitle] = useState<string | null>(null);
+  const [postCaption, setPostCaption] = useState<string | null>(null);
+  const [defaultPostCaption, setDefaultPostCaption] = useState<string | null>(
+    null
+  );
   const [postImage, setPostImage] = useState<File | null>(null);
   const [defaultPostImage, setDefaultPostImage] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
@@ -57,9 +64,13 @@ export default function UpdatePostProvider({
     { id: number; image: string | null }[]
   >([]);
   const [defaultProducts, setDefaultProducts] = useState<DefaultProduct[]>([]);
+  const [status, setStatus] = useState<"PENDING" | "PUBLISHED" | "REJECTED">(
+    "PENDING"
+  );
   const [toggleValue, toggle] = useToggle(false);
 
   function resetStates() {
+    setPostIndex(-1);
     setPostId("");
     setPostTitle("");
     setPostCaption("");
@@ -78,6 +89,8 @@ export default function UpdatePostProvider({
         setPostIndex,
         postId,
         setPostId,
+        postUserId,
+        setPostUserId,
         postTitle,
         setPostTitle,
         postCaption,
@@ -97,6 +110,8 @@ export default function UpdatePostProvider({
         defaultProducts,
         setDefaultProducts,
         toggleValue,
+        status,
+        setStatus,
         toggle,
         resetStates,
       }}

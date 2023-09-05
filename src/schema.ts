@@ -1,4 +1,4 @@
-import { relations, InferModel } from "drizzle-orm";
+import { relations, InferModel, InferSelectModel } from "drizzle-orm";
 import {
   serial,
   text,
@@ -14,11 +14,11 @@ import type { AdapterAccount } from "@auth/core/adapters";
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   displayName: text("display_name"),
-  username: text("username").notNull().unique(),
+  name: text("name").notNull().unique(),
   image: text("image"),
   email: text("email").notNull().unique(),
   emailVerified: timestamp("emailVerified", { mode: "date" }),
-  isEmailVerified: boolean("is_verified").default(false),
+  isEmailVerified: boolean("is_email_verified").default(false),
   phone: text("phone"),
   password: text("password"),
   isAdmin: boolean("is_admin").default(false),
@@ -67,15 +67,20 @@ export const verificationToken = pgTable("verificationToken", {
   token: text("token").notNull(),
   issuedAt: timestamp("issued_at", { mode: "date" }).notNull(),
   expiresAt: timestamp("expires_at", { mode: "date" }).notNull(),
-  userId: uuid("userId")
+  userEmail: text("user_email")
     .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+    .references(() => user.email, { onDelete: "cascade" }),
 });
 
 export const post = pgTable("post", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
   title: text("title"),
   caption: text("caption"),
+  status: text("status", {
+    enum: ["PENDING", "PUBLISHED", "REJECTED"],
+  })
+    .default("PENDING")
+    .notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).default(
     new Date()
   ),
@@ -118,7 +123,7 @@ export const productRelations = relations(product, ({ one }) => ({
   post: one(post, { fields: [product.postId], references: [post.id] }),
 }));
 
-export type User = InferModel<typeof user>;
-export type Post = InferModel<typeof post>;
-export type Image = InferModel<typeof image>;
-export type Product = InferModel<typeof product>;
+export type User = InferSelectModel<typeof user>;
+export type Post = InferSelectModel<typeof post>;
+export type Image = InferSelectModel<typeof image>;
+export type Product = InferSelectModel<typeof product>;

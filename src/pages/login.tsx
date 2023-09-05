@@ -4,14 +4,16 @@ import zod from "zod";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
-import { getServerSession } from "next-auth";
+import { AuthUser, getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
 import { useRouter } from "next/router";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useUser } from "@/hooks/useUser";
 import Link from "next/link";
+import { deleteCookie } from "@/utils/cookies";
 
 const schema = zod.object({
   email: zod.string().email("Please enter a valid email address"),
@@ -22,7 +24,9 @@ type RegisterData = zod.infer<typeof schema>;
 
 export default function Register() {
   const { replace } = useRouter();
+  const { data: session } = useSession();
   const [isAccountValid, setIsAccountValid] = useState(true);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const {
     register,
     handleSubmit,
@@ -33,11 +37,12 @@ export default function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   async function onSubmit(data: RegisterData) {
+    setIsAccountValid(true);
+    setIsEmailVerified(false)
     setIsLoading((prev) => !prev);
     try {
       const res = await signIn("credentials", { ...data, redirect: false });
       if (!res || !res.ok) throw new Error("Invalid credentials");
-      replace("/profile");
     } catch (err) {
       setIsAccountValid(false);
     } finally {
@@ -45,6 +50,25 @@ export default function Register() {
       setIsLoading((prev) => !prev);
     }
   }
+
+  function checkEmailVerified() {
+    if (session) {
+      const user = session.user as AuthUser | undefined;
+      if (!user?.isEmailVerified) {
+        signOut({
+          redirect: false,
+        });
+        setIsEmailVerified(true)
+        return;
+      }
+      replace("/profile");
+    }
+  }
+
+  useEffect(() => {
+    checkEmailVerified();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
   return (
     <div className="px-4 py-10 grid place-items-center">
       <Card className="mx-auto pb-4 max-w-lg w-full border shadow-slate-200 shadow-md dark:shadow-slate-950">
@@ -90,16 +114,20 @@ export default function Register() {
           >
             Github
           </Button>
-          <div className="mt-4 text-center">
-            <Link href="/register" className="text-sm">
-              Sing up
-            </Link>
+          <div className="mt-4 text-sm flex justify-between">
+            <Link href="/register">Sing up</Link>
+            <Link href="/forgot-password">Forgot password?</Link>
           </div>
         </CardContent>
       </Card>
       {!isAccountValid && (
         <p className="mt-4 text-center text-destructive">
-          ❌ Invalid credentials, please try again
+          ❌ Invalid credentials, please try again.
+        </p>
+      )}
+      {isEmailVerified && (
+        <p className="mt-4 text-center text-muted-foreground">
+          📧 Your account is not verified yet.
         </p>
       )}
     </div>
@@ -135,7 +163,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (session) {
     return {
       redirect: {
-        destination: "/",
+        destination: "/profile",
         permanent: false,
       },
     };

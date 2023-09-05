@@ -54,13 +54,18 @@ export default function Settings() {
   const user = useUser();
   const { data: session, update } = useSession();
   const { mutate: updateAccount } = trpc.userRouter.update.useMutation();
-  const { mutate: resetPassword, isLoading: isResettingPassword } =
-    trpc.userRouter.resetPassword.useMutation();
+  const { mutate: sendEmail, isLoading: isSendingEmail } =
+    trpc.userRouter.sendEmail.useMutation();
   const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<{
+    url?: string | null;
+    image: File | null;
+  }>({ url: user?.image, image: null });
+  const imageUrl = useImageUrl(profilePicture.url ?? "", [profilePicture]);
 
   const defaultValues: Partial<AccountFormValues> = {
     username: user?.name ?? "",
-    displayName: user?.username ?? "",
+    displayName: user?.displayname ?? "",
     phone: user?.phone ?? "",
     email: user?.email ?? "",
   };
@@ -69,12 +74,6 @@ export default function Settings() {
     resolver: zodResolver(accountFormSchema),
     defaultValues,
   });
-
-  const [profilePicture, setProfilePicture] = useState<{
-    url?: string | null;
-    image: File | null;
-  }>({ url: user?.image, image: null });
-  const imageUrl = useImageUrl(profilePicture.url ?? "", [profilePicture]);
 
   async function onSubmit(data: AccountFormValues) {
     if (!user) return;
@@ -139,12 +138,13 @@ export default function Settings() {
 
   function handleResetPassword() {
     if (!user) return;
-    resetPassword(
+    sendEmail(
       {
         userId: user.id,
         name: user.name,
         email: user.email,
         origin: location.origin,
+        template: "CHANGE_PASSWORD",
       },
       {
         onError: (error) => handleError(error),
@@ -154,7 +154,6 @@ export default function Settings() {
             className: "text-green-500",
           });
         },
-        onSettled: () => setIsUpdatingAccount(false),
       }
     );
   }
@@ -301,7 +300,7 @@ export default function Settings() {
         className="mt-4 flex items-center gap-x-1"
         onClick={handleResetPassword}
       >
-        {isResettingPassword ? (
+        {isSendingEmail ? (
           <>
             Change password
             <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />

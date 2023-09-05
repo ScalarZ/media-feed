@@ -18,7 +18,7 @@ export default function UpdatePost() {
       <Input
         placeholder="Add a post title"
         onChange={(e) => setPostTitle(e.target.value)}
-        defaultValue={postTitle}
+        defaultValue={postTitle ?? ""}
       />
       <ImagePlaceHolder
         id="post-image"
@@ -38,7 +38,7 @@ export default function UpdatePost() {
       <Input
         placeholder="Add a post caption"
         onChange={(e) => setPostCaption(e.target.value)}
-        defaultValue={postCaption}
+        defaultValue={postCaption ?? ""}
       />
     </div>
   );

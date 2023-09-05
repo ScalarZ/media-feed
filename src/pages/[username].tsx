@@ -16,7 +16,10 @@ function User({ user }: { user: AuthUser }) {
   return (
     <div className="relative pt-2 pb-20">
       <h1 className="py-2 text-xl text-center font-semibold">
-        Welcome to <span className="text-blue-600">{user.username}&apos;s</span>{" "}
+        Welcome to{" "}
+        <span className="text-blue-600">
+          {user.displayname || user.name}&apos;s
+        </span>{" "}
         feeds 👋
       </h1>
       <Posts user={user} view={view} handleView={handleView} />

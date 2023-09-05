@@ -21,6 +21,7 @@ import { useUser } from "@/hooks/useUser";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/router";
 import { handleError } from "@/utils/handleError";
+import { signIn } from "next-auth/react";
 
 const passwordSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -28,13 +29,8 @@ const passwordSchema = z.object({
 
 type Password = z.infer<typeof passwordSchema>;
 
-export default function ChangePassword({
-  payload,
-}: {
-  payload: string | JwtPayload;
-}) {
-  const user = useUser();
-  const router = useRouter();
+export default function ResetPassword({ payload }: { payload: JwtPayload }) {
+  const { replace } = useRouter();
   const { mutate: updatePassword, isLoading: setIsUpdatingPassword } =
     trpc.userRouter.updatePassword.useMutation();
 
@@ -42,18 +38,25 @@ export default function ChangePassword({
     resolver: zodResolver(passwordSchema),
   });
 
+  async function handleSignIn(email: string, password: string) {
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+    });
+    if (!res || !res.ok) throw new Error("Invalid credentials");
+    replace("/profile");
+  }
+
   async function onSubmit(data: Password) {
-    if (!user) return;
     updatePassword(
       {
-        userEmail: user.email,
+        userEmail: payload.email,
         password: data.password,
       },
       {
         onError: (error) => handleError(error),
-        onSuccess: () => {
-          router.replace("/profile");
-        },
+        onSuccess: async () => handleSignIn(payload.email, data.password),
       }
     );
   }
@@ -81,11 +84,11 @@ export default function ChangePassword({
           <Button type="submit" className="flex items-center gap-x-1">
             {setIsUpdatingPassword ? (
               <>
-                Changing
+                Resetting
                 <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />
               </>
             ) : (
-              <>Change password</>
+              <>Reset password</>
             )}
           </Button>
         </form>
@@ -96,10 +99,10 @@ export default function ChangePassword({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getServerSession(context.req, context.res, authOptions);
-  if (!session)
+  if (session)
     return {
       redirect: {
-        destination: "/login",
+        destination: "/profile",
         permanent: false,
       },
     };

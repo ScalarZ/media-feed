@@ -7,7 +7,7 @@ import { useState } from "react";
 
 export default function Profile({ user }: { user: AuthUser }) {
   const [view, setView] = useState<"scroll" | "grid">("scroll");
-
+  console.log(user)
   function handleView(view: "scroll" | "grid") {
     setView(view);
   }

@@ -7,7 +7,7 @@ export async function checkTokenValidation(payload: JwtPayload) {
   const token = await db
     .select()
     .from(verificationToken)
-    .where(eq(verificationToken.userId, payload.userId))
+    .where(eq(verificationToken.userEmail, payload.email))
     .orderBy(desc(verificationToken.id))
     .limit(1);
 

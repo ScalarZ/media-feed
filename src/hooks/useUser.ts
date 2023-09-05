@@ -4,6 +4,8 @@ import { useMemo } from "react";
 
 export function useUser() {
   const { data } = useSession();
-  const user = useMemo(() => data?.user, [data]) as AuthUser | undefined;
-  return user;
+  return useMemo(() => {
+    const user = data?.user as AuthUser | undefined;
+    return user && user.isEmailVerified ? user : undefined;
+  }, [data]);
 }

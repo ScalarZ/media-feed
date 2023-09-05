@@ -6,6 +6,9 @@ import NextImage from "../common/Image";
 import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { AuthUser } from "next-auth";
 import type { Post, _Product } from "@/types";
+import clsx from "clsx";
+import { useUser } from "@/hooks/useUser";
+import { useSession } from "next-auth/react";
 
 export default function Post({
   index,
@@ -15,9 +18,10 @@ export default function Post({
   image: { id, url },
   product: products,
   userId,
-  user,
   view,
   handleView,
+  status,
+  user,
 }: Post & {
   index: number;
   user?: AuthUser;
@@ -27,6 +31,7 @@ export default function Post({
   const {
     setPostIndex,
     setPostId,
+    setPostUserId,
     setPostTitle,
     setPostCaption,
     setDefaultPostImage,
@@ -36,12 +41,14 @@ export default function Post({
     defaultPostImage,
     defaultProducts,
     postIndex,
+    setStatus,
   } = useUpdatePost();
   const imgref = useRef<HTMLImageElement>(null);
   const imageUrl = useImageUrl(url);
   async function setUpEditWindow() {
     setPostIndex(index);
     setPostId(postId);
+    setPostUserId(userId);
     setPostTitle(title);
     setPostCaption(caption);
     setDefaultPostTitle(title);
@@ -58,6 +65,7 @@ export default function Post({
         defaultImage: image,
       }))
     );
+    setStatus(status);
   }
 
   function scrollToPost() {
@@ -71,8 +79,11 @@ export default function Post({
   }
   useEffect(() => {
     scrollToPost();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
+
+  if ((!user || user.id !== userId) && status !== "PUBLISHED") return <></>;
+
   return (
     <Card
       className={
@@ -92,7 +103,7 @@ export default function Post({
           {...(view === "scroll"
             ? { height: 300, width: 500 }
             : { fill: true })}
-          alt={title}
+          alt={title ?? "#"}
           className={view === "grid" ? "object-cover" : ""}
           onClick={() => {
             if (!handleView || view === "scroll") return;
@@ -104,6 +115,17 @@ export default function Post({
       {view === "scroll" ? (
         <>
           <CardContent className="pl-4 pr-3 py-2 space-y-1">
+            {user?.id === userId && (
+              <span
+                className={clsx("text-xs", {
+                  "text-muted-foreground": status === "PENDING",
+                  "text-green-500": status === "PUBLISHED",
+                  "text-destructive": status === "REJECTED",
+                })}
+              >
+                {status}
+              </span>
+            )}
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl">{title}</CardTitle>
               <PostSettings

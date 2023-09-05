@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { DrizzleError, eq } from "drizzle-orm";
 import { JwtPayload, decode, sign } from "jsonwebtoken";
 import { transporter } from "@/utils/createTransport";
+import { selectTemplate } from "@/utils/templates";
 
 const isDrizzleError = (err: unknown): err is DrizzleError =>
   err !== null && typeof err === "object" && "stack" in err;
@@ -26,7 +27,7 @@ export const userRouter = router({
       }) => {
         try {
           await db.insert(user).values({
-            username,
+            name: username,
             email,
             password,
             createdAt: new Date(createdAt),
@@ -87,56 +88,83 @@ export const userRouter = router({
         }
       }
     ),
-  resetPassword: procedure
+  sendEmail: procedure
     .input(
       z.object({
-        userId: z.string(),
-        name: z.string(),
+        userId: z.string().optional(),
+        name: z.string().optional(),
         email: z.string(),
         origin: z.string(),
+        template: z.enum(["CHANGE_PASSWORD", "RESET_PASSWORD"]),
       })
     )
-    .mutation(async ({ input: { userId, email, origin }, ctx: { db } }) => {
+    .mutation(
+      async ({ input: { userId, email, origin, template }, ctx: { db } }) => {
+        try {
+          const code = (Math.random() * 36).toString(36);
+
+          const token = sign(
+            {
+              userId,
+              email,
+              code,
+            },
+            process.env.JWT_SECRET!,
+            {
+              expiresIn: 5 * 60,
+            }
+          );
+
+          const payload = decode(token) as JwtPayload;
+          const selectedTemplate = selectTemplate(template, token, origin);
+          await Promise.all([
+            transporter.sendMail({
+              from: "User <josiah.bernier@ethereal.email>",
+              to: email,
+              ...selectedTemplate,
+            }),
+            db.insert(verificationToken).values({
+              token: code,
+              issuedAt: new Date(payload.iat! * 1000),
+              expiresAt: new Date(payload.exp! * 1000),
+              userEmail: email,
+            }),
+          ]);
+          return {
+            message: "a verification token has been sent to your email address",
+          };
+        } catch (err) {
+          console.log(err);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "An unexpected error occurred, please try again later.",
+            cause: err,
+          });
+        }
+      }
+    ),
+  updatePassword: procedure
+    .input(
+      z.object({
+        userEmail: z.string(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input: { userEmail, password }, ctx: { db } }) => {
       try {
-        const code = (Math.random() * 36).toString(36);
-
-        const token = sign(
-          {
-            userId,
-            email,
-            code,
-          },
-          process.env.JWT_SECRET!,
-          {
-            expiresIn: 5 * 60,
-          }
-        );
-
-        const payload = decode(token) as JwtPayload;
-
         await Promise.all([
-          transporter.sendMail({
-            from: "Fares <jeanne45@ethereal.email>",
-            to: email,
-            subject: "Resetting password",
-            text: `
-                  Welcome
-                  ${origin}/reset-password?token=${token}
-                  `,
-            html: `
-                  <h1>Welcome 🚀</h1>
-                  <a target="_blank" rel="noopener noreferrer" href='${origin}/change-password?token=${token}'>Click here to change your password</a>
-                  `,
-          }),
-          db.insert(verificationToken).values({
-            token: code,
-            issuedAt: new Date(payload.iat! * 1000),
-            expiresAt: new Date(payload.exp! * 1000),
-            userId,
-          }),
+          db
+            .update(user)
+            .set({
+              password,
+            })
+            .where(eq(user.email, userEmail)),
+          db
+            .delete(verificationToken)
+            .where(eq(verificationToken.userEmail, userEmail)),
         ]);
         return {
-          message: "a verification token has been sent to your email address",
+          message: "Your account password has been updated successfully",
         };
       } catch (err) {
         throw new TRPCError({
@@ -146,14 +174,14 @@ export const userRouter = router({
         });
       }
     }),
-  updatePassword: procedure
+  forgotPassword: procedure
     .input(
       z.object({
-        userId: z.string(),
+        userEmail: z.string(),
         password: z.string(),
       })
     )
-    .mutation(async ({ input: { userId, password }, ctx: { db } }) => {
+    .mutation(async ({ input: { userEmail, password }, ctx: { db } }) => {
       try {
         await Promise.all([
           db
@@ -161,10 +189,10 @@ export const userRouter = router({
             .set({
               password,
             })
-            .where(eq(user.id, userId)),
+            .where(eq(user.email, userEmail)),
           db
             .delete(verificationToken)
-            .where(eq(verificationToken.userId, userId)),
+            .where(eq(verificationToken.userEmail, userEmail)),
         ]);
         return {
           message: "Your account password has been updated successfully",
@@ -186,9 +214,9 @@ export const userRouter = router({
     .mutation(async ({ input: { username }, ctx: { db } }) => {
       try {
         const usernames = await db
-          .select({ username: user.username })
+          .select({ username: user.name })
           .from(user)
-          .where(eq(user.username, username));
+          .where(eq(user.name, username));
 
         if (!usernames || !usernames.length) {
           return {

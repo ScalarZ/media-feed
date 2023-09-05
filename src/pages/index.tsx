@@ -12,7 +12,7 @@ export default function Home() {
         Welcome
         {user ? (
           <span className="mx-2 text-blue-600">
-            {user.username || user.name}
+            {user.displayname || user.name}
           </span>
         ) : null}
         👋

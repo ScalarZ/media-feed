@@ -24,7 +24,9 @@ export const authOptions: NextAuthOptions = {
         try {
           const { data: user, error } = (await supabase
             .from("user")
-            .select("id, email, username, name, phone, image")
+            .select(
+              "id, email, name, displayName:display_name, phone, image, isAdmin:is_admin, isEmailVerified:is_email_verified"
+            )
             .match({
               email: credentials?.email!,
               password: credentials?.password!,
@@ -33,7 +35,6 @@ export const authOptions: NextAuthOptions = {
             data: { id: string; email: string };
             error: PostgresError;
           };
-
           if (error || !user) throw error;
 
           return {
@@ -48,6 +49,9 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
+      profile(profile) {
+        return { id: 1, role: profile.role ?? "user", ...profile };
+      },
     }),
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -56,10 +60,16 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    async signIn({ account, user, profile, credentials, email }) {
+      console.log({ account, user, profile, credentials, email });
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (trigger === "update") {
         return { ...token, ...session.user };
       }
+      // @ts-ignore
+      if (user) token.role = user.role;
       return { ...token, ...user };
     },
     async session({ session, token }) {
