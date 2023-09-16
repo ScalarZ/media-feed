@@ -19,9 +19,8 @@ import { AuthUser } from "next-auth";
 export default function Header() {
   const user = useUser();
   const imageUrl = useImageUrl(user?.image ?? "", [user]);
-
   return (
-    <header className="sticky top-0 px-4 py-3 w-full flex justify-between items-center bg-white shadow z-10">
+    <header className="sticky top-0 px-4 py-3 w-full flex justify-between items-center bg-white shadow z-20">
       {user ? (
         <>
           <CreatePostWindow />
@@ -84,7 +83,7 @@ function Menu({
           </DropdownMenuItem>
         </Link>
         {user.isAdmin && (
-          <Link href="/admin-portal">
+          <Link href="/admin-portal/posts">
             <DropdownMenuItem className="flex items-center gap-x-1 cursor-pointer">
               <Shield size={14} />
               <span className="mb-0.5">Admin portal</span>

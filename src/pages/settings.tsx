@@ -30,6 +30,7 @@ import {
   supabaseBucketUrl,
 } from "@/utils/uploadImage";
 import { useSession } from "next-auth/react";
+import DeleteAccount from "@/components/DeleteAccount";
 
 const accountFormSchema = z.object({
   username: z
@@ -40,7 +41,7 @@ const accountFormSchema = z.object({
     .max(30, {
       message: "Username must not be longer than 30 characters.",
     }),
-  displayName: z.string().max(30, {
+  displayname: z.string().max(30, {
     message: "Displayname must not be longer than 30 characters.",
   }),
   phone: z.string().regex(/^(\d{10}|)$/, "Phone must be at least 10 digits."),
@@ -65,7 +66,7 @@ export default function Settings() {
 
   const defaultValues: Partial<AccountFormValues> = {
     username: user?.name ?? "",
-    displayName: user?.displayname ?? "",
+    displayname: user?.displayname ?? "",
     phone: user?.phone ?? "",
     email: user?.email ?? "",
   };
@@ -121,7 +122,7 @@ export default function Settings() {
       return null;
     }
 
-    if (!user.image) {
+    if (!user.image || !user.image.startsWith(supabaseBucketUrl)) {
       const { data } = await uploadImage(
         "profiles",
         profilePicture.image,
@@ -195,7 +196,7 @@ export default function Settings() {
           />
           <FormField
             control={form.control}
-            name="displayName"
+            name="displayname"
             render={({ field }) => (
               <FormItem>
                 <FormLabel className="font-semibold">Display name</FormLabel>
@@ -294,21 +295,24 @@ export default function Settings() {
         </form>
       </Form>
       <Separator />
-      <Button
-        type="button"
-        variant="destructive"
-        className="mt-4 flex items-center gap-x-1"
-        onClick={handleResetPassword}
-      >
-        {isSendingEmail ? (
-          <>
-            Change password
-            <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />
-          </>
-        ) : (
-          <> Change password</>
-        )}
-      </Button>
+      <div className="mt-4 f flex justify-between items-center">
+        <Button
+          type="button"
+          variant="destructive"
+          className="lex items-center gap-x-1"
+          onClick={handleResetPassword}
+        >
+          {isSendingEmail ? (
+            <>
+              Change password
+              <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />
+            </>
+          ) : (
+            <> Change password</>
+          )}
+        </Button>
+        <DeleteAccount userId={user?.id} />
+      </div>
     </div>
   );
 }

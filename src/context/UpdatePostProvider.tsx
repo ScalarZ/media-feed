@@ -38,6 +38,8 @@ interface Context {
   setStatus: (status: "PENDING" | "PUBLISHED" | "REJECTED") => void;
   toggleValue: boolean;
   toggle: () => void;
+  cropImage: boolean;
+  setCropImage: () => void;
   resetStates: () => void;
 }
 
@@ -68,6 +70,7 @@ export default function UpdatePostProvider({
     "PENDING"
   );
   const [toggleValue, toggle] = useToggle(false);
+  const [cropImage, setCropImage] = useToggle(false);
 
   function resetStates() {
     setPostIndex(-1);
@@ -113,6 +116,8 @@ export default function UpdatePostProvider({
         status,
         setStatus,
         toggle,
+        cropImage,
+        setCropImage,
         resetStates,
       }}
     >

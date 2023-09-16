@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
-import { DataTable } from "@/components/Admin/DataTable";
-import { columns } from "@/components/Admin/DataTable/Columns";
+import DataTable from "@/components/Admin/PostsTable";
+import { columns } from "@/components/Admin/Columns/PostsTableColumns";
 import Filter from "@/components/Admin/Filter";
 import { Separator } from "@/components/ui/separator";
-import { useToggle } from "@/hooks/useToggle";
 import { useUser } from "@/hooks/useUser";
 import { Image, Post, Product } from "@/schema";
-import { trpc } from "@/utils/trpc";
+import NavBar from "@/components/Admin/NavBar";
 
 export interface DataPost extends Post {
   user: {
@@ -25,7 +24,7 @@ export default function AdminPortal() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl text-center font-semibold">Admin Portal</h1>
+      <NavBar />
       <Filter user={user} setData={setData} />
       <Separator />
       {data.length ? (

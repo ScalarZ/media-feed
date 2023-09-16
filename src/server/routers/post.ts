@@ -228,7 +228,7 @@ export const postRouter = router({
             image: true,
             product: true,
           },
-          orderBy: (post, { asc, desc }) => [desc(post.createdAt)],
+          orderBy: (post, { desc }) => [desc(post.createdAt)],
           where: eq(post.userId, userId),
         });
 

@@ -6,12 +6,14 @@ import { useUpdatePost } from "@/context/UpdatePostProvider";
 
 export default function UpdatePost() {
   const {
+    postImage,
     postTitle,
     postCaption,
     defaultPostImage,
     setPostTitle,
     setPostCaption,
     setPostImage,
+    setCropImage,
   } = useUpdatePost();
   return (
     <div className="mb-4 flex flex-col gap-y-2">
@@ -23,6 +25,8 @@ export default function UpdatePost() {
       <ImagePlaceHolder
         id="post-image"
         defaultUrl={!!defaultPostImage ? defaultPostImage : undefined}
+        postImage={postImage}
+        setCropImage={setCropImage}
         onChange={(e) => {
           const files = e.target.files;
           if (files && files.length) {

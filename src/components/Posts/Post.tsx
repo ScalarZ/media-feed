@@ -7,8 +7,6 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import { AuthUser } from "next-auth";
 import type { Post, _Product } from "@/types";
 import clsx from "clsx";
-import { useUser } from "@/hooks/useUser";
-import { useSession } from "next-auth/react";
 
 export default function Post({
   index,
@@ -133,7 +131,7 @@ export default function Post({
                 postImage={defaultPostImage}
                 products={defaultProducts}
                 setUpEditWindow={setUpEditWindow}
-                isUserPost={user ? user.id === userId : false}
+                isUserPost={user ? user.id === userId || user.isAdmin : false}
               />
             </div>
             <p className="opacity-70">{caption}</p>

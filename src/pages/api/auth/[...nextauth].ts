@@ -3,9 +3,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import GithubProvider from "next-auth/providers/github";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { supabase } from "@/lib/supabase";
-import { PostgresError } from "postgres";
 import { db } from "@/lib/db";
+import { authorizeUser, getUserByEmail } from "@/utils/getUser";
 
 export const authOptions: NextAuthOptions = {
   // @ts-ignore
@@ -22,23 +21,15 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const { data: user, error } = (await supabase
-            .from("user")
-            .select(
-              "id, email, name, displayName:display_name, phone, image, isAdmin:is_admin, isEmailVerified:is_email_verified"
-            )
-            .match({
-              email: credentials?.email!,
-              password: credentials?.password!,
-            })
-            .single()) as unknown as {
-            data: { id: string; email: string };
-            error: PostgresError;
-          };
+          const { user, error } = await authorizeUser(
+            credentials?.email!,
+            credentials?.password!
+          );
           if (error || !user) throw error;
 
           return {
             ...user,
+            provider: "email",
           };
         } catch (error) {
           return null;
@@ -49,9 +40,6 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
-      profile(profile) {
-        return { id: 1, role: profile.role ?? "user", ...profile };
-      },
     }),
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID!,
@@ -60,16 +48,21 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ account, user, profile, credentials, email }) {
-      console.log({ account, user, profile, credentials, email });
-      return true;
-    },
     async jwt({ token, user, trigger, session }) {
+      if (
+        (trigger === "signUp" || trigger === "signIn") &&
+        // @ts-ignore
+        user?.provider !== "email"
+      ) {
+        const { user: profile, error } = await getUserByEmail(user.email!);
+        if (!profile || !profile.isEmailVerified || error)
+          throw new Error("email not verified");
+        return { ...token, ...profile };
+      }
       if (trigger === "update") {
         return { ...token, ...session.user };
       }
-      // @ts-ignore
-      if (user) token.role = user.role;
+
       return { ...token, ...user };
     },
     async session({ session, token }) {
@@ -79,6 +72,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/login",
+    error: "/error",
   },
 };
 

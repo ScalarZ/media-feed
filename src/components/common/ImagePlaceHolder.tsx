@@ -1,9 +1,8 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useMemo } from "react";
 import { Label } from "../ui/label";
 import Image, { ImageLoaderProps } from "next/image";
 import { useUploadImage } from "@/hooks/useUploadImage";
-import { Upload, } from "lucide-react";
-import { useUpdatePost } from "@/context/UpdatePostProvider";
+import { Crop, Upload } from "lucide-react";
 import useImageUrl from "@/hooks/useImageUrl";
 
 export default function ImagePlaceHolder({
@@ -12,15 +11,23 @@ export default function ImagePlaceHolder({
   defaultUrl,
   children,
   onChange,
+  postImage,
+  setCropImage,
 }: {
   id: string;
   index?: number;
   defaultUrl?: string;
+  postImage?: File | null;
   children: React.ReactNode;
+  setCropImage?: () => void;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
 }) {
   const { url, handleOnChange, removeImage } = useUploadImage(index);
   const imageUrl = useImageUrl(defaultUrl || "");
+  const croppedImageUrl = useMemo(
+    () => (postImage ? URL.createObjectURL(postImage) : ""),
+    [postImage]
+  );
 
   return (
     <div
@@ -28,7 +35,7 @@ export default function ImagePlaceHolder({
         !url && "opacity-60 hover:opacity-100"
       }`}
     >
-      {!!url || defaultUrl ? (
+      {!!url || !!croppedImageUrl || defaultUrl ? (
         <>
           <Label
             htmlFor={id}
@@ -36,9 +43,16 @@ export default function ImagePlaceHolder({
           >
             <Upload className="absolute top-1 right-1 z-10 text-slate-500 hover:text-blue-500 cursor-pointer" />
           </Label>
+
+          {setCropImage ? (
+            <Crop
+              className="absolute top-1 left-1 z-10 text-slate-500 hover:text-blue-500 cursor-pointer"
+              onClick={setCropImage}
+            />
+          ) : null}
           <Image
             loader={({ src }: ImageLoaderProps) => src}
-            src={url || imageUrl}
+            src={url || croppedImageUrl || imageUrl}
             fill
             alt={url || defaultUrl || "#"}
             className="object-cover"

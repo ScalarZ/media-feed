@@ -1,4 +1,4 @@
-import { DataPost } from "@/pages/admin-portal";
+import { DataPost } from "@/pages/admin-portal/posts";
 import { ColumnDef } from "@tanstack/react-table";
 import { format } from "date-fns";
 import clsx from "clsx";

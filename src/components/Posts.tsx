@@ -18,8 +18,11 @@ export default function Posts({
 }) {
   const loggedUser = useUser();
 
-  const { data, isLoading: isLoadingPosts } =
-    trpc.postRouter.loadPosts.useQuery({ userId: user.id });
+  const {
+    data,
+    isLoading: isLoadingPosts,
+    refetch,
+  } = trpc.postRouter.loadPosts.useQuery({ userId: user.id });
   const { resetStates, toggle, toggleValue } = useUpdatePost();
 
   if (isLoadingPosts)
@@ -55,7 +58,7 @@ export default function Posts({
             handleView={handleView}
           />
         ))}
-        <EditPostWindow />
+        <EditPostWindow refetch={refetch} />
       </Dialog>
     </div>
   );

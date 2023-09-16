@@ -5,7 +5,7 @@ import { getImageUrl } from "@/utils/getImageUrl";
 import { handleError } from "@/utils/handleError";
 import { trpc } from "@/utils/trpc";
 import { uploadImage } from "@/utils/uploadImage";
-import { Loader2, X } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import CreatePost from "./CreatePost";
 import Divider from "./common/Divider";
 import CreateProductsList from "./CreateProductsList";
@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { useQueryClient } from "@tanstack/react-query";
 import getLoadPostsQueryParams from "@/QueryParams/getLoadPostsQueryParams";
+import ImageCropper from "./ImageCropper";
 
 export default function CreatePostWindow() {
   const user = useUser();
@@ -35,11 +36,13 @@ export default function CreatePostWindow() {
     setProducts,
     toggleValue,
     toggle,
+    cropImage,
+    setCropImage,
     resetStates,
   } = useCreatePost();
+
   const { mutate: createPost } = trpc.postRouter.createPost.useMutation();
   const [isCreatingPost, setIsCreatingPost] = useState(false);
-
   const loadPostsQueryParams = useMemo(
     () => getLoadPostsQueryParams(user),
     [user]
@@ -112,53 +115,60 @@ export default function CreatePostWindow() {
       <DialogTrigger asChild>
         <Button>Create post</Button>
       </DialogTrigger>
-      <DialogContent className="overflow-y-scroll h-screen max-w-md">
-        <DialogHeader>
-          <div className="flex justify-between items-center">
-            <DialogTitle>Create post</DialogTitle>
-          </div>
-        </DialogHeader>
-        <CreatePost />
-        <Divider />
-        <CreateProductsList />
-        <DialogFooter>
-          <div className="w-full flex justify-between">
-            <Button
-              variant="outline"
-              onClick={() =>
-                setProducts((prev) => [
-                  ...prev,
-                  { title: "", link: "", image: null },
-                ])
-              }
-            >
-              Add product
-            </Button>
-            <div className="flex gap-x-2">
-              <DialogClose className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-primary-foreground hover:bg-destructive/90 h-10 px-4 py-2 flex items-center gap-x-1">
-                Cancel
-              </DialogClose>
-              <Button
-                className="flex items-center gap-x-1"
-                onClick={handleCreatePost}
-              >
-                {isCreatingPost ? (
-                  <>
-                    Creating
-                    <Loader2
-                      strokeWidth={2.5}
-                      size={14}
-                      className="animate-spin"
-                    />
-                  </>
-                ) : (
-                  <>Create</>
-                )}
-              </Button>
+      {cropImage ? (
+        <DialogContent className="px-0 overflow-y-auto h-screen max-w-md flex flex-col gap-y-2">
+          <DialogTitle className="px-4">Crop Image</DialogTitle>
+          <ImageCropper />
+        </DialogContent>
+      ) : (
+        <DialogContent className="px-0 overflow-y-auto h-screen max-w-md">
+          <DialogHeader className="px-4">
+            <div className="flex justify-between items-center">
+              <DialogTitle>Create post</DialogTitle>
             </div>
-          </div>
-        </DialogFooter>
-      </DialogContent>
+          </DialogHeader>
+          <CreatePost />
+          <Divider />
+          <CreateProductsList />
+          <DialogFooter className="px-4">
+            <div className="w-full flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setProducts((prev) => [
+                    ...prev,
+                    { title: "", link: "", image: null },
+                  ])
+                }
+              >
+                Add product
+              </Button>
+              <div className="flex gap-x-2">
+                <DialogClose className="justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-primary-foreground hover:bg-destructive/90 h-10 px-4 py-2 flex items-center gap-x-1">
+                  Cancel
+                </DialogClose>
+                <Button
+                  className="flex items-center gap-x-1"
+                  onClick={handleCreatePost}
+                >
+                  {isCreatingPost ? (
+                    <>
+                      Creating
+                      <Loader2
+                        strokeWidth={2.5}
+                        size={14}
+                        className="animate-spin"
+                      />
+                    </>
+                  ) : (
+                    <>Create</>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      )}
     </Dialog>
   );
 }

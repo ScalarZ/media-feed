@@ -13,7 +13,7 @@ import type { AdapterAccount } from "@auth/core/adapters";
 
 export const user = pgTable("user", {
   id: uuid("id").defaultRandom().primaryKey().notNull(),
-  displayName: text("display_name"),
+  displayname: text("display_name"),
   name: text("name").notNull().unique(),
   image: text("image"),
   email: text("email").notNull().unique(),

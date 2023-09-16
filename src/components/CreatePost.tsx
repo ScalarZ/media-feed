@@ -5,13 +5,21 @@ import { Image as ImageIcon } from "lucide-react";
 import { useCreatePost } from "@/context/CreatePostProvider";
 
 export default function CreatePost() {
-  const { setPostTitle, setPostCaption, setPostImage } = useCreatePost();
+  const {
+    setPostTitle,
+    setPostCaption,
+    setPostImage,
+    postImage,
+    setCropImage,
+  } = useCreatePost();
   return (
-    <div className="mb-4 flex flex-col gap-y-2">
-      <Input
-        placeholder="Add a post title"
-        onChange={(e) => setPostTitle(e.target.value)}
-      />
+    <div className="flex flex-col gap-y-2">
+      <div className="px-4">
+        <Input
+          placeholder="Add a post title"
+          onChange={(e) => setPostTitle(e.target.value)}
+        />
+      </div>
       <ImagePlaceHolder
         id="post-image"
         onChange={(e) => {
@@ -20,16 +28,20 @@ export default function CreatePost() {
             setPostImage(files[0]);
           }
         }}
+        postImage={postImage}
+        setCropImage={setCropImage}
       >
         <div className="grid place-items-center">
           <ImageIcon strokeWidth={1} size={84} />
           <h3 className="text-xl font-semibold">Upload a post image</h3>
         </div>
       </ImagePlaceHolder>
-      <Input
-        placeholder="Add a post caption"
-        onChange={(e) => setPostCaption(e.target.value)}
-      />
+      <div className="px-4">
+        <Input
+          placeholder="Add a post caption"
+          onChange={(e) => setPostCaption(e.target.value)}
+        />
+      </div>
     </div>
   );
 }

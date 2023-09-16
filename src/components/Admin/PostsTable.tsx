@@ -14,7 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
-import { DataPost } from "@/pages/admin-portal";
+import { DataPost } from "@/pages/admin-portal/posts";
 import { Dialog, DialogTrigger } from "../ui/dialog";
 import EditPostWindow from "../EditPostWindow";
 import { Dispatch, SetStateAction } from "react";
@@ -25,7 +25,7 @@ interface DataTableProps<TData, TValue> {
   setData: Dispatch<SetStateAction<DataPost[]>>;
 }
 
-export function DataTable<TData, TValue>({
+export default function DataTable<TData, TValue>({
   columns,
   data,
   setData,
@@ -104,22 +104,24 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row, i) => (
-                <DialogTrigger asChild key={row.id}>
-                  <TableRow
-                    data-state={row.getIsSelected() && "selected"}
-                    onClick={() => setUpEditWindow(row.original as DataPost, i)}
-                    className="cursor-pointer"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                </DialogTrigger>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                  onClick={() => {
+                    setUpEditWindow(row.original as DataPost, i);
+                    toggle();
+                  }}
+                  className="cursor-pointer"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
               ))
             ) : (
               <TableRow>

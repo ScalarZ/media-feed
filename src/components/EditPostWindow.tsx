@@ -24,7 +24,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Post, _Product } from "@/types";
 import getLoadPostsQueryParams from "@/QueryParams/getLoadPostsQueryParams";
 import clsx from "clsx";
-import { DataPost } from "@/pages/admin-portal";
+import { DataPost } from "@/pages/admin-portal/posts";
+import EditImageCropper from "./EditImageCropper";
 
 type AddedProduct = {
   title: string;
@@ -44,8 +45,10 @@ function isPostList(data: unknown): data is Post[] {
 
 export default function EditPostWindow({
   setData,
+  refetch,
 }: {
   setData?: Dispatch<SetStateAction<DataPost[]>>;
+  refetch?: () => void;
 }) {
   const user = useUser();
   const { toast } = useToast();
@@ -66,6 +69,7 @@ export default function EditPostWindow({
     toggle,
     resetStates,
     status,
+    cropImage,
   } = useUpdatePost();
   const queryClient = useQueryClient();
   const { mutate: updatePost } = trpc.postRouter.updatePost.useMutation();
@@ -79,6 +83,7 @@ export default function EditPostWindow({
     () => getLoadPostsQueryParams(user),
     [user]
   );
+
   function checkForEmptyInputs() {
     return (
       !user ||
@@ -134,7 +139,6 @@ export default function EditPostWindow({
       .filter((product) => product !== undefined);
     const addedProducts = products
       .map(({ title, link }, i) => {
-        if (!res[i + 1 + defaultProducts.length]) return;
         return {
           title,
           link,
@@ -146,7 +150,6 @@ export default function EditPostWindow({
         };
       })
       .filter((product) => product !== undefined);
-
     updatePost(
       {
         postId,
@@ -168,9 +171,9 @@ export default function EditPostWindow({
       },
       {
         onSuccess: async ({ message }) => {
-          await queryClient.invalidateQueries({
-            queryKey: loadPostsQueryParams,
-          });
+          if (refetch) {
+            refetch();
+          }
           toast({
             description: message,
             className: "text-green-500",
@@ -204,13 +207,21 @@ export default function EditPostWindow({
               prev[postIndex].status = status;
               return [...prev];
             });
+          if (refetch) {
+            refetch();
+          }
         },
         onError: handleError,
         onSettled: () => setUpdatedStatus("PUBLISHED"),
       }
     );
   }
-  return (
+  return cropImage ? (
+    <DialogContent className="px-0 overflow-y-auto h-screen max-w-md flex flex-col gap-y-2">
+      <DialogTitle className="px-4">Crop Image</DialogTitle>
+      <EditImageCropper />
+    </DialogContent>
+  ) : (
     <DialogContent className="overflow-y-auto h-screen max-w-md">
       <DialogHeader>
         <div className="flex justify-between items-center">

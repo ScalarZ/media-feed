@@ -13,6 +13,8 @@ interface Context {
   setProducts: (cb: (product: Product[]) => Product[]) => void;
   toggleValue: boolean;
   toggle: () => void;
+  cropImage: boolean;
+  setCropImage: () => void;
   resetStates: () => void;
 }
 
@@ -30,6 +32,8 @@ export default function CreatePostProvider({
     { title: "", image: null, link: "" },
   ]);
   const [toggleValue, toggle] = useToggle(false);
+  const [cropImage, setCropImage] = useToggle(false);
+
   function resetStates() {
     setPostTitle("");
     setPostCaption("");
@@ -49,6 +53,8 @@ export default function CreatePostProvider({
         setProducts,
         toggleValue,
         toggle,
+        cropImage,
+        setCropImage,
         resetStates,
       }}
     >

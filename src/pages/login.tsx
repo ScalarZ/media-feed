@@ -23,7 +23,7 @@ const schema = zod.object({
 type RegisterData = zod.infer<typeof schema>;
 
 export default function Register() {
-  const { replace } = useRouter();
+  const { replace, query, push } = useRouter();
   const { data: session } = useSession();
   const [isAccountValid, setIsAccountValid] = useState(true);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
@@ -36,9 +36,10 @@ export default function Register() {
     resolver: zodResolver(schema),
   });
   const [isLoading, setIsLoading] = useState(false);
+
   async function onSubmit(data: RegisterData) {
     setIsAccountValid(true);
-    setIsEmailVerified(false)
+    setIsEmailVerified(false);
     setIsLoading((prev) => !prev);
     try {
       const res = await signIn("credentials", { ...data, redirect: false });
@@ -58,7 +59,7 @@ export default function Register() {
         signOut({
           redirect: false,
         });
-        setIsEmailVerified(true)
+        setIsEmailVerified(true);
         return;
       }
       replace("/profile");
@@ -66,9 +67,13 @@ export default function Register() {
   }
 
   useEffect(() => {
+    if (query && query.error === "Callback") {
+      setIsEmailVerified(true);
+      push("/login");
+    }
     checkEmailVerified();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+  }, [session, query]);
   return (
     <div className="px-4 py-10 grid place-items-center">
       <Card className="mx-auto pb-4 max-w-lg w-full border shadow-slate-200 shadow-md dark:shadow-slate-950">

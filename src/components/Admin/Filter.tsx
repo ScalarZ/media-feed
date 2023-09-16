@@ -22,7 +22,7 @@ import {
 import { AuthUser } from "next-auth";
 import { trpc } from "@/utils/trpc";
 import { handleError } from "@/utils/handleError";
-import { DataPost } from "@/pages/admin-portal";
+import { DataPost } from "@/pages/admin-portal/posts";
 import { statusList } from "./Constants";
 import { Loader2 } from "lucide-react";
 

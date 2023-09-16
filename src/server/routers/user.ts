@@ -2,7 +2,7 @@ import { z } from "zod";
 import { procedure, router } from "../trpc";
 import { user, verificationToken } from "@/schema";
 import { TRPCError } from "@trpc/server";
-import { DrizzleError, eq } from "drizzle-orm";
+import { DrizzleError, and, eq } from "drizzle-orm";
 import { JwtPayload, decode, sign } from "jsonwebtoken";
 import { transporter } from "@/utils/createTransport";
 import { selectTemplate } from "@/utils/templates";
@@ -55,7 +55,7 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        displayName: z.string(),
+        displayname: z.string(),
         phone: z.string(),
         image: z.string().nullable(),
         updatedAt: z.number(),
@@ -63,14 +63,14 @@ export const userRouter = router({
     )
     .mutation(
       async ({
-        input: { userId, displayName, phone, image, updatedAt },
+        input: { userId, displayname, phone, image, updatedAt },
         ctx: { db },
       }) => {
         try {
           await db
             .update(user)
             .set({
-              displayName,
+              displayname,
               phone,
               updatedAt: new Date(updatedAt),
               ...(image ? { image } : {}),
@@ -232,6 +232,91 @@ export const userRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "An unexpected error occurred, please try again later.",
+          cause: err,
+        });
+      }
+    }),
+  getUsers: procedure
+    .input(
+      z.object({
+        isAdmin: z.boolean(),
+      })
+    )
+    .query(async ({ input: { isAdmin }, ctx: { db } }) => {
+      try {
+        if (!isAdmin) throw new Error("Not an admin");
+
+        const users = await db
+          .select({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            displayname: user.displayname,
+            image: user.image,
+            phone: user.phone,
+            isEmailVerified: user.isEmailVerified,
+          })
+          .from(user);
+
+        return users;
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: err,
+        });
+      }
+    }),
+  verify: procedure
+    .input(
+      z.object({
+        userId: z.string(),
+        verifyStatus: z.boolean(),
+      })
+    )
+    .mutation(async ({ input: { userId, verifyStatus }, ctx: { db } }) => {
+      try {
+        await db
+          .update(user)
+          .set({ isEmailVerified: verifyStatus })
+          .where(eq(user.id, userId));
+
+        return {
+          message: `User is ${verifyStatus ? "verified" : "un-verified"}`,
+        };
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: err,
+        });
+      }
+    }),
+  deleteAccount: procedure
+    .input(
+      z.object({
+        userId: z.string(),
+        password: z.string(),
+      })
+    )
+    .mutation(async ({ input: { userId, password }, ctx: { db } }) => {
+      try {
+        const users = await db
+          .delete(user)
+          .where(and(eq(user.id, userId), eq(user.password, password)))
+          .returning();
+
+        if (!users || !users.length) throw new Error("Invalid password");
+        return {
+          message: `Your account has been deleted successfully`,
+        };
+      } catch (err) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message:
+            err !== null && typeof err == "object" && "message" in err
+              ? (err.message as string)
+              : "An unexpected error occurred, please try again later.",
           cause: err,
         });
       }
