@@ -8,6 +8,7 @@ declare module "next-auth" {
     phone: string | null;
     isEmailVerified: boolean;
     isAdmin: boolean;
+    provider?: string;
   }
 }
 

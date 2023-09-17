@@ -13,13 +13,20 @@ import { Loader2 } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import { signOut } from "next-auth/react";
-import { handleError } from "@/utils/handleError";
 import { FormEvent, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "@radix-ui/react-label";
 
-export default function DeleteAccount({ userId }: { userId?: string }) {
-  const { replace } = useRouter();
+export default function DeleteAccount({
+  userId,
+  noPassword,
+  isEmail,
+}: {
+  userId?: string;
+  noPassword?: boolean;
+  isEmail?: boolean;
+}) {
+  const { replace, reload } = useRouter();
   const [toggleValue, toggle] = useToggle();
   const [password, setPassword] = useState("");
   const [invalidPassword, setInvalidPassword] = useState(false);
@@ -28,15 +35,18 @@ export default function DeleteAccount({ userId }: { userId?: string }) {
 
   function handleDeleteAccount(e: FormEvent) {
     e.preventDefault();
-    setInvalidPassword(false)
-    if (!userId || !password) return;
+    setInvalidPassword(false);
+    if (!userId || (!password && !noPassword)) return;
     deleteAccount(
       {
         userId,
-        password,
+        password: noPassword ? password : undefined,
       },
       {
         onSuccess: async () => {
+          if (noPassword && !isEmail) {
+            reload();
+          }
           await signOut({ redirect: false });
           replace("/");
         },
@@ -66,19 +76,21 @@ export default function DeleteAccount({ userId }: { userId?: string }) {
           and remove your data from our servers.
         </AlertDialogDescription>
         <form onSubmit={handleDeleteAccount}>
-          <div className="space-y-1">
-            <Label>Password</Label>
-            <Input
-              type="password"
-              placeholder="Type your password..."
-              value={password}
-              required
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            {invalidPassword && (
-              <p className="text-destructive text-sm">Invalid password</p>
-            )}
-          </div>
+          {!noPassword ? (
+            <div className="space-y-1">
+              <Label>Password</Label>
+              <Input
+                type="password"
+                placeholder="Type your password..."
+                value={password}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              {invalidPassword && (
+                <p className="text-destructive text-sm">Invalid password</p>
+              )}
+            </div>
+          ) : null}
           <AlertDialogFooter className="pt-4">
             <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
             <Button

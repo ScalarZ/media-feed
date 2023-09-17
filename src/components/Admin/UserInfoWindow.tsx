@@ -16,6 +16,7 @@ import { trpc } from "@/utils/trpc";
 import { handleError } from "@/utils/handleError";
 import { useToast } from "../ui/use-toast";
 import { Dispatch, SetStateAction } from "react";
+import DeleteAccount from "../DeleteAccount";
 
 export default function UserInfoWindow({
   userInfo,
@@ -91,7 +92,7 @@ export default function UserInfoWindow({
           </div>
           <div className="mt-4 grid gap-y-4">
             {Object.keys(userInfo ?? {}).map((key, i) =>
-              !["image", "name", "isEmailVerified","index"].includes(key) ? (
+              !["image", "name", "isEmailVerified", "index"].includes(key) ? (
                 <div key={i} className="space-y-1">
                   <Label className="font-semibold">
                     {key.replace(key[0], key[0].toUpperCase())}
@@ -114,6 +115,7 @@ export default function UserInfoWindow({
             <DialogClose className="h-10 px-4 py-2 border rounded-md">
               Cancel
             </DialogClose>
+            <DeleteAccount userId={userInfo?.id} noPassword={true} />
             <Button
               className="bg-destructive flex items-center gap-x-1 hover:bg-red-600"
               disabled={!userInfo?.isEmailVerified}

@@ -158,7 +158,6 @@ export default function Settings() {
       }
     );
   }
-
   return (
     <div className="px-4 pt-4 pb-8">
       <h1 className="text-xl font-semibold">Account</h1>
@@ -311,7 +310,11 @@ export default function Settings() {
             <> Change password</>
           )}
         </Button>
-        <DeleteAccount userId={user?.id} />
+        <DeleteAccount
+          userId={user?.id}
+          noPassword={user?.provider === "email" ? false : true}
+          isEmail={true}
+        />
       </div>
     </div>
   );

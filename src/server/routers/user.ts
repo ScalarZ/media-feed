@@ -304,14 +304,19 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        password: z.string(),
+        password: z.string().optional(),
       })
     )
     .mutation(async ({ input: { userId, password }, ctx: { db } }) => {
       try {
         const users = await db
           .delete(user)
-          .where(and(eq(user.id, userId), eq(user.password, password)))
+          .where(
+            and(
+              eq(user.id, userId),
+              password ? eq(user.password, password) : undefined
+            )
+          )
           .returning();
 
         if (!users || !users.length) throw new Error("Invalid password");
