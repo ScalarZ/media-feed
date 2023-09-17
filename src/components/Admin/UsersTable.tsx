@@ -70,7 +70,10 @@ export default function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                   className="cursor-pointer"
                   onClick={() =>
-                    handleSetupUserInfo(row.original as unknown as DataUser)
+                    handleSetupUserInfo({
+                      index: i,
+                      ...row.original,
+                    } as unknown as DataUser)
                   }
                 >
                   {row.getVisibleCells().map((cell) => (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import DataTable from "@/components/Admin/PostsTable";
+import PostsTable from "@/components/Admin/PostsTable";
 import { columns } from "@/components/Admin/Columns/PostsTableColumns";
-import Filter from "@/components/Admin/Filter";
+import PostsFilter from "@/components/Admin/PostsFilter";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from "@/hooks/useUser";
 import { Image, Post, Product } from "@/schema";
@@ -25,10 +25,10 @@ export default function AdminPortal() {
   return (
     <div className="p-4">
       <NavBar />
-      <Filter user={user} setData={setData} />
+      <PostsFilter user={user} setData={setData} />
       <Separator />
       {data.length ? (
-        <DataTable columns={columns} data={data} setData={setData} />
+        <PostsTable columns={columns} data={data} setData={setData} />
       ) : null}
     </div>
   );

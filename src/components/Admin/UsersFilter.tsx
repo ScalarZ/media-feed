@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import RangeDatePicker from "@/components/Admin/RangeDatePicker";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,59 +11,46 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { AuthUser } from "next-auth";
 import { trpc } from "@/utils/trpc";
 import { handleError } from "@/utils/handleError";
-import { DataPost } from "@/pages/admin-portal/posts";
-import { statusList } from "./Constants";
 import { Loader2 } from "lucide-react";
+import { Checkbox } from "../ui/checkbox";
+import { DataUser } from "@/pages/admin-portal/users";
 
 const filterSchema = z.object({
   username: z.string().optional(),
-  dateRange: z.object({ from: z.date(), to: z.date() }).optional(),
-  status: z.enum(["PENDING", "PUBLISHED", "REJECTED"]).optional(),
+  email: z.string().optional(),
+  verified: z.boolean(),
 });
 
 export type FilterSchema = z.infer<typeof filterSchema>;
 
-export default function Filter({
+export default function PostsFilter({
   user,
   setData,
 }: {
   user?: AuthUser;
-  setData: (data: DataPost[]) => void;
+  setData: (data: DataUser[]) => void;
 }) {
-  const { mutate: searchPosts, isLoading: isSearchingPosts } =
-    trpc.postRouter.searchPosts.useMutation();
+  const { mutate: searchUsers, isLoading: isSearchingUsers } =
+    trpc.userRouter.searchUsers.useMutation();
+
   const form = useForm<FilterSchema>({
     resolver: zodResolver(filterSchema),
+    defaultValues: {
+      verified: false,
+    },
   });
+
   async function onSubmit(data: FilterSchema) {
     if (!user) return;
-    searchPosts(
-      {
-        ...data,
-        dateRange: data.dateRange
-          ? {
-              from: data.dateRange.from.toString(),
-              to: data.dateRange.to.toString(),
-            }
-          : undefined,
+    searchUsers(data, {
+      onSuccess: (users) => {
+        setData(users as unknown as DataUser[]);
       },
-      {
-        onSuccess: (posts) => {
-          setData(posts as unknown as DataPost[]);
-        },
-        onError: (err) => handleError(err),
-      }
-    );
+      onError: handleError,
+    });
   }
   return (
     <Form {...form}>
@@ -84,12 +70,12 @@ export default function Filter({
         />
         <FormField
           control={form.control}
-          name="dateRange"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-semibold">Date range</FormLabel>
+              <FormLabel className="font-semibold">Email</FormLabel>
               <FormControl>
-                <RangeDatePicker field={field} />
+                <Input type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,41 +83,28 @@ export default function Filter({
         />
         <FormField
           control={form.control}
-          name="status"
+          name="verified"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-semibold">Status</FormLabel>
+            <FormItem className="flex items-center gap-x-2 space-y-0">
+              <FormLabel className="font-semibold">Verified</FormLabel>
               <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {statusList.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" className="flex items-center gap-x-1">
-          {isSearchingPosts ? (
+          {isSearchingUsers ? (
             <>
               Searching
               <Loader2 strokeWidth={2.5} size={14} className="animate-spin" />
             </>
           ) : (
-            <>Search Posts</>
+            <>Search Users</>
           )}
         </Button>
       </form>

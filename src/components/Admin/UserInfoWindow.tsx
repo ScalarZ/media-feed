@@ -15,19 +15,20 @@ import clsx from "clsx";
 import { trpc } from "@/utils/trpc";
 import { handleError } from "@/utils/handleError";
 import { useToast } from "../ui/use-toast";
+import { Dispatch, SetStateAction } from "react";
 
 export default function UserInfoWindow({
   userInfo,
   setUserInfo,
   toggleValue,
   toggle,
-  refetch,
+  setData,
 }: {
   userInfo: DataUser | null;
   toggleValue: boolean;
   setUserInfo: (userInfo: DataUser | null) => void;
   toggle: () => void;
-  refetch: () => void;
+  setData: Dispatch<SetStateAction<DataUser[]>>;
 }) {
   const { toast } = useToast();
   const { mutate: verify, isLoading } = trpc.userRouter.verify.useMutation();
@@ -45,7 +46,12 @@ export default function UserInfoWindow({
             description: message,
           });
           setUserInfo(null);
-          refetch();
+          if (userInfo.index !== undefined) {
+            setData((prev) => {
+              prev[userInfo.index!].isEmailVerified = !userInfo.isEmailVerified;
+              return [...prev];
+            });
+          }
           toggle();
         },
         onError: (err) => handleError(err),
@@ -85,7 +91,7 @@ export default function UserInfoWindow({
           </div>
           <div className="mt-4 grid gap-y-4">
             {Object.keys(userInfo ?? {}).map((key, i) =>
-              !["image", "name", "isEmailVerified"].includes(key) ? (
+              !["image", "name", "isEmailVerified","index"].includes(key) ? (
                 <div key={i} className="space-y-1">
                   <Label className="font-semibold">
                     {key.replace(key[0], key[0].toUpperCase())}

@@ -11,7 +11,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ControllerRenderProps } from "react-hook-form";
-import { FilterSchema } from "./Filter";
+import { FilterSchema } from "./PostsFilter";
 
 export default function RangeDatePicker({
   field,

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { procedure, router } from "../trpc";
 import { user, verificationToken } from "@/schema";
 import { TRPCError } from "@trpc/server";
-import { DrizzleError, and, eq } from "drizzle-orm";
+import { DrizzleError, and, eq, ilike } from "drizzle-orm";
 import { JwtPayload, decode, sign } from "jsonwebtoken";
 import { transporter } from "@/utils/createTransport";
 import { selectTemplate } from "@/utils/templates";
@@ -236,16 +236,17 @@ export const userRouter = router({
         });
       }
     }),
-  getUsers: procedure
+  searchUsers: procedure
     .input(
       z.object({
-        isAdmin: z.boolean(),
+        username: z.string().optional(),
+        email: z.string().optional(),
+        verified: z.boolean(),
       })
     )
-    .query(async ({ input: { isAdmin }, ctx: { db } }) => {
+    .mutation(async ({ input: { username, email, verified }, ctx: { db } }) => {
       try {
-        if (!isAdmin) throw new Error("Not an admin");
-
+        console.log({ username, email, verified });
         const users = await db
           .select({
             id: user.id,
@@ -256,7 +257,14 @@ export const userRouter = router({
             phone: user.phone,
             isEmailVerified: user.isEmailVerified,
           })
-          .from(user);
+          .from(user)
+          .where(
+            and(
+              username ? ilike(user.name, `%${username}%`) : undefined,
+              email ? ilike(user.email, `%${email}%`) : undefined,
+              eq(user.isEmailVerified, verified)
+            )
+          );
 
         return users;
       } catch (err) {
