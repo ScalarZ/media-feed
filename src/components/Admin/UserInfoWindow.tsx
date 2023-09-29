@@ -17,6 +17,7 @@ import { handleError } from "@/utils/handleError";
 import { useToast } from "../ui/use-toast";
 import { Dispatch, SetStateAction } from "react";
 import DeleteAccount from "../DeleteAccount";
+import Link from "next/link";
 
 export default function UserInfoWindow({
   userInfo,
@@ -88,7 +89,11 @@ export default function UserInfoWindow({
             ) : (
               <UserCircle strokeWidth={1} size={80} />
             )}
-            <span className="text-xl font-semibold">{userInfo?.name}</span>
+            <Link href={`/${userInfo?.name}`}>
+              <span className="text-xl font-semibold hover:text-blue-600">
+                {userInfo?.name}
+              </span>
+            </Link>
           </div>
           <div className="mt-4 grid gap-y-4">
             {Object.keys(userInfo ?? {}).map((key, i) =>

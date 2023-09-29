@@ -18,9 +18,10 @@ export default function UpdatePost() {
   return (
     <div className="mb-4 flex flex-col gap-y-2">
       <Input
-        placeholder="Add a post title"
+        placeholder="Add a post title (24 character max)"
         onChange={(e) => setPostTitle(e.target.value)}
         defaultValue={postTitle ?? ""}
+        maxLength={24}
       />
       <ImagePlaceHolder
         id="post-image"
@@ -40,9 +41,10 @@ export default function UpdatePost() {
         </div>
       </ImagePlaceHolder>
       <Input
-        placeholder="Add a post caption"
+        placeholder="Add a post caption (34 character max)"
         onChange={(e) => setPostCaption(e.target.value)}
         defaultValue={postCaption ?? ""}
+        maxLength={34}
       />
     </div>
   );

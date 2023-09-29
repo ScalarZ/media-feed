@@ -29,7 +29,7 @@ import { Loader2 } from "lucide-react";
 const filterSchema = z.object({
   username: z.string().optional(),
   dateRange: z.object({ from: z.date(), to: z.date() }).optional(),
-  status: z.enum(["PENDING", "PUBLISHED", "REJECTED"]).optional(),
+  status: z.enum(["PENDING", "PUBLISHED", "REJECTED", "ALL"]).optional(),
 });
 
 export type FilterSchema = z.infer<typeof filterSchema>;

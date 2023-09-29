@@ -178,10 +178,8 @@ export default function EditPostWindow({
             description: message,
             className: "text-green-500",
           });
-          if (!user?.isAdmin) {
-            toggle();
-            resetStates();
-          }
+          toggle();
+          resetStates();
         },
         onError: handleError,
         onSettled: () => setIsUpdatingPost(false),

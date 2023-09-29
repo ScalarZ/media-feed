@@ -42,7 +42,8 @@ export default function CreateProduct({
       </div>
       <div className="flex-grow space-y-2">
         <Input
-          placeholder="Add a product title"
+          placeholder="Add a product title (24 characters max)"
+          maxLength={24}
           onChange={(e) =>
             setProducts((prev) => {
               prev[i].title = e.target.value;
@@ -51,7 +52,8 @@ export default function CreateProduct({
           }
         />
         <Input
-          placeholder="Add a product link"
+          placeholder="Add a product link (24 characters max)"
+          maxLength={24}
           onChange={(e) =>
             setProducts((prev) => {
               prev[i].link = e.target.value;

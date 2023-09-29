@@ -5,6 +5,7 @@ import { TRPCError } from "@trpc/server";
 import { SQL, and, eq, gte, ilike, inArray, lte } from "drizzle-orm";
 import { Post } from "@/types";
 import { getSQL } from "@/utils/getSQL";
+import { statusList } from "@/components/Admin/Constants";
 
 export const postRouter = router({
   createPost: procedure
@@ -247,7 +248,7 @@ export const postRouter = router({
       z.object({
         username: z.string().optional(),
         dateRange: z.object({ from: z.string(), to: z.string() }).optional(),
-        status: z.enum(["PENDING", "PUBLISHED", "REJECTED"]).optional(),
+        status: z.enum(statusList).optional(),
       })
     )
     .mutation(
@@ -278,7 +279,7 @@ export const postRouter = router({
                     users.map(({ id }) => id)
                   )
                 : undefined,
-              status ? eq(post.status, status) : undefined,
+              status && status !== "ALL" ? eq(post.status, status) : undefined,
               dateRange
                 ? and(
                     gte(post.createdAt, new Date(dateRange.from)),

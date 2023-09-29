@@ -102,7 +102,7 @@ export default function Post({
             ? { height: 300, width: 500 }
             : { fill: true })}
           alt={title ?? "#"}
-          className={view === "grid" ? "object-cover" : ""}
+          className={`aspect-square object-cover ${view === "grid" ? "object-cover" : null}`}
           onClick={() => {
             if (!handleView || view === "scroll") return;
             handleView("scroll");

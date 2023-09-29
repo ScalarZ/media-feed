@@ -1,5 +1,5 @@
 import * as React from "react";
-import { addDays, format } from "date-fns";
+import { subDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
@@ -20,8 +20,8 @@ export default function RangeDatePicker({
   field: ControllerRenderProps<FilterSchema, "dateRange">;
 }) {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(),
-    to: addDays(new Date(), 20),
+    from: subDays(new Date(), 7),
+    to: new Date(),
   });
 
   return (

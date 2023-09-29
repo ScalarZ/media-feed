@@ -11,7 +11,7 @@ export default function Profile({ user }: { user: AuthUser }) {
     setView(view);
   }
   return (
-    <main className="relative pb-8">
+    <main className="relative pb-16">
       {!!user && <Posts user={user} view={view} handleView={handleView} />}
       <div className="fixed bottom-0 py-2 w-full max-w-md border flex justify-center gap-x-6 bg-white z-10">
         <GalleryVertical

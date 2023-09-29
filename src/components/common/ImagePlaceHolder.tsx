@@ -41,12 +41,12 @@ export default function ImagePlaceHolder({
             htmlFor={id}
             className="absolute inset-0 grid place-items-center place-content-center cursor-pointer"
           >
-            <Upload className="absolute top-1 right-1 z-10 text-slate-500 hover:text-blue-500 cursor-pointer" />
+            <Upload className="absolute top-1 right-1 p-1 z-10 text-slate-500 bg-white hover:text-blue-500 cursor-pointer box-content" />
           </Label>
 
           {setCropImage ? (
             <Crop
-              className="absolute top-1 left-1 z-10 text-slate-500 hover:text-blue-500 cursor-pointer"
+              className="absolute top-1 left-1 p-1 z-10 text-slate-500 bg-white hover:text-blue-500 cursor-pointer box-content"
               onClick={setCropImage}
             />
           ) : null}

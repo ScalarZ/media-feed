@@ -16,8 +16,9 @@ export default function CreatePost() {
     <div className="flex flex-col gap-y-2">
       <div className="px-4">
         <Input
-          placeholder="Add a post title"
+          placeholder="Add a post title (24 characters max)"
           onChange={(e) => setPostTitle(e.target.value)}
+          maxLength={24}
         />
       </div>
       <ImagePlaceHolder
@@ -38,8 +39,9 @@ export default function CreatePost() {
       </ImagePlaceHolder>
       <div className="px-4">
         <Input
-          placeholder="Add a post caption"
+          placeholder="Add a post caption (34 characters max)"
           onChange={(e) => setPostCaption(e.target.value)}
+          maxLength={34}
         />
       </div>
     </div>

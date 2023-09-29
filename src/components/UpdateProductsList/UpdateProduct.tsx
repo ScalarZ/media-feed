@@ -70,7 +70,8 @@ export default function UpdateProduct({
       </div>
       <div className="flex-grow space-y-2">
         <Input
-          placeholder="Add a product title"
+          placeholder="Add a product title (34 character max)"
+          maxLength={34}
           onChange={(e) =>
             setDefaultProducts
               ? setDefaultProducts((prev) => {
@@ -85,7 +86,8 @@ export default function UpdateProduct({
           defaultValue={defaultProduct?.title ?? ""}
         />
         <Input
-          placeholder="Add a product link"
+          placeholder="Add a product link (34 character max)"
+          maxLength={34}
           onChange={(e) =>
             setDefaultProducts
               ? setDefaultProducts((prev) => {
