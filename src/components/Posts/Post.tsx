@@ -102,7 +102,9 @@ export default function Post({
             ? { height: 300, width: 500 }
             : { fill: true })}
           alt={title ?? "#"}
-          className={`aspect-square object-cover ${view === "grid" ? "object-cover" : null}`}
+          className={`aspect-square object-cover ${
+            view === "grid" ? "object-cover" : null
+          }`}
           onClick={() => {
             if (!handleView || view === "scroll") return;
             handleView("scroll");
@@ -161,7 +163,7 @@ function Product({ id, image, title, link }: _Product) {
   const imageUrl = useImageUrl(image ?? "");
   return (
     <div className="p-2 border flex gap-x-4 hover:bg-slate-100">
-      {image ? (
+      {/* {image ? (
         <div className="relative w-16">
           <NextImage
             src={imageUrl}
@@ -170,9 +172,9 @@ function Product({ id, image, title, link }: _Product) {
             alt={id.toString()}
           />
         </div>
-      ) : null}
+      ) : null} */}
       <div className="flex-grow space-y-2 flex items-center">
-        <h3 className="font-medium">{title || link}</h3>
+        <h3 className="font-medium">{title || "Display URL not provided"}</h3>
       </div>
     </div>
   );

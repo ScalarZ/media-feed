@@ -249,10 +249,19 @@ export const postRouter = router({
         username: z.string().optional(),
         dateRange: z.object({ from: z.string(), to: z.string() }).optional(),
         status: z.enum(statusList).optional(),
+        orderBy: z
+          .object({
+            oderType: z.enum(["asc", "desc"]),
+            column: z.enum(["Username", "Date"]),
+          })
+          .optional(),
       })
     )
     .mutation(
-      async ({ input: { username, dateRange, status }, ctx: { db } }) => {
+      async ({
+        input: { username, dateRange, status, orderBy },
+        ctx: { db },
+      }) => {
         try {
           let users: { id: string }[] = [];
           if (username) {
@@ -287,6 +296,15 @@ export const postRouter = router({
                   )
                 : undefined
             ),
+            // ...(orderBy && orderBy.column === "Username"
+            //   ? {
+            //       orderBy: (posts, { asc, desc }) => [
+            //         orderBy.oderType === "asc"
+            //           ? asc(posts.createdAt)
+            //           : desc(posts.createdAt),
+            //       ],
+            //     }
+            //   : {}),
           });
 
           return posts;

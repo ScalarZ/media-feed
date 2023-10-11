@@ -21,7 +21,7 @@ export default function CreateProduct({
           }}
         />
       )}
-      <div className="w-24">
+      {/* <div className="w-24">
         <ImagePlaceHolder
           id={`product-image-${i}`}
           onChange={(e) => {
@@ -39,10 +39,10 @@ export default function CreateProduct({
             <h3 className="text-xs">Upload image</h3>
           </div>
         </ImagePlaceHolder>
-      </div>
+      </div> */}
       <div className="flex-grow space-y-2">
         <Input
-          placeholder="Add a product title (24 characters max)"
+          placeholder="Add a product display URL (24 characters max)"
           maxLength={24}
           onChange={(e) =>
             setProducts((prev) => {
@@ -52,8 +52,7 @@ export default function CreateProduct({
           }
         />
         <Input
-          placeholder="Add a product link (24 characters max)"
-          maxLength={24}
+          placeholder="Add a product URL (24 characters max)"
           onChange={(e) =>
             setProducts((prev) => {
               prev[i].link = e.target.value;

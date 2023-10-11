@@ -2,6 +2,7 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
@@ -15,9 +16,9 @@ import {
 } from "@/components/ui/table";
 import { useUpdatePost } from "@/context/UpdatePostProvider";
 import { DataPost } from "@/pages/admin-portal/posts";
-import { Dialog, DialogTrigger } from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 import EditPostWindow from "../EditPostWindow";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,6 +34,7 @@ export default function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
+    getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
   });
   const {
