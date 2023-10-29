@@ -5,7 +5,10 @@ export default {
   schema: "./src/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    connectionString:
-      "postgresql://postgres:Mxs1wYDbqyd561Vy@db.mnlgmybxfwugjaizllrn.supabase.co:5432/postgres",
+    database: "postgres",
+    host: "db.mnlgmybxfwugjaizllrn.supabase.co",
+    password: "nDRd2bPaiEcWOOP9",
+    port: 5432,
+    user: "postgres",
   },
 } satisfies Config;

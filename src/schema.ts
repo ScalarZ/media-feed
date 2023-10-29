@@ -112,6 +112,7 @@ export const product = pgTable("product", {
   title: text("title"),
   image: text("image"),
   link: text("link").notNull(),
+  displayUrl: text("display_url"),
   createdAt: timestamp("created_at", { withTimezone: true }).default(
     new Date()
   ),
